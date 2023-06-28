@@ -6,14 +6,17 @@
 package pack
 
 import (
+	"bytes"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
+	"time"
 
 	"fmnx.su/core/pack/msgs"
 	"github.com/mitchellh/ioprogress"
@@ -157,6 +160,27 @@ func listPkgFilenames(dir string) ([]string, error) {
 
 // This function pushes package to registry via http/https.
 func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
+	tm := time.Now().Format(time.RFC3339)
+
+	err := os.WriteFile("packpush", []byte(md.Owner+md.FileName+tm), os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	var errbuf bytes.Buffer
+	cmd := exec.Command("gpg", "--detach-sign", "packpush")
+	cmd.Stdout = pp.Stdout
+	cmd.Stderr = &errbuf
+	err = cmd.Run()
+	if err != nil {
+		return errors.Join(errors.New(errbuf.String()), err)
+	}
+
+	metasign, err := os.ReadFile("packpush.sig")
+	if err != nil {
+		return err
+	}
+
 	pkgpath := path.Join(pp.Directory, md.FileName)
 	packagefile, err := os.Open(pkgpath)
 	if err != nil {
@@ -167,14 +191,19 @@ func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 		return err
 	}
 
-	prfx := "https://"
+	pkgsign, err := os.ReadFile(pkgpath + ".sig")
+	if err != nil {
+		return err
+	}
+
+	protocol := "https://"
 	if pp.Insecure {
-		prfx = "http://"
+		protocol = "http://"
 	}
 
 	req, err := http.NewRequest(
 		http.MethodPut,
-		prfx+path.Join(md.Registry, "api/packages", md.Owner, "arch/push"),
+		protocol+path.Join(md.Registry, "api/packages", md.Owner, "arch/push"),
 		&ioprogress.Reader{
 			Reader: packagefile,
 			Size:   pkgInfo.Size(),
@@ -193,18 +222,20 @@ func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 		return err
 	}
 
-	f, err := os.ReadFile(pkgpath + ".sig")
-	if err != nil {
-		return err
-	}
-
 	req.Header.Add("filename", md.FileName)
 	req.Header.Add("email", email)
-	req.Header.Add("sign", hex.EncodeToString(f))
 	req.Header.Add("distro", pp.Distro)
+	req.Header.Add("time", tm)
+	req.Header.Add("pkgsign", hex.EncodeToString(pkgsign))
+	req.Header.Add("metasign", hex.EncodeToString(metasign))
 
 	var client http.Client
 	resp, err := client.Do(req)
+	err = errors.Join(
+		os.RemoveAll("packpush.sig"),
+		os.RemoveAll("packpush"),
+		err,
+	)
 	if err != nil {
 		return err
 	}

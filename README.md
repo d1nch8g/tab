@@ -115,7 +115,7 @@ usage:  pack {-B --build} [options] <(registry)/(owner)/package(s)>
 options:
         --info    Show information about your GnuPG keys
         --gen     Generate GnuPG key for package singing
-        --armor   Export public GnuPG key armor
+        --export   Export public GnuPG key armor
         --recv    Run recieve key operaion
         --setpkgr Automatically set packager in makepkg.conf
         --flutter Generate PKGBUILD, app.sh and app.desktop for flutter application
@@ -123,7 +123,3 @@ options:
 
 usage:  pack {-U --util} [options] <(args)>
 ```
-
-<!-- recvkey
-gpg --recv-key 34F27D80E9AC9881528BE30744A372184A26D3EB
- -->

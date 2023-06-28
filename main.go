@@ -59,7 +59,7 @@ var opts struct {
 
 	// Util options.
 	Gen     bool `long:"gen"`
-	Armor   bool `long:"armor"`
+	Exoport bool `long:"export"`
 	Recv    bool `long:"recv"`
 	Setpkgr bool `long:"setpkgr"`
 	Flutter bool `long:"flutter"`
@@ -179,7 +179,7 @@ func run() error {
 			Stderr:  os.Stderr,
 			Stdin:   os.Stdin,
 			Gen:     opts.Gen,
-			Armor:   opts.Armor,
+			Armor:   opts.Exoport,
 			Recv:    opts.Recv,
 			Setpkgr: opts.Setpkgr,
 			Flutter: opts.Flutter,

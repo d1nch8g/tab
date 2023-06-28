@@ -136,7 +136,7 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 		return err
 	}
 
-	err = os.WriteFile("packdel", []byte(t+owner+target), os.ModePerm)
+	err = os.WriteFile("packdel", []byte(owner+target+t), os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -150,24 +150,19 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 		return errors.Join(errors.New(errbuf.String()), err)
 	}
 
-	err = os.RemoveAll("packdel")
-	if err != nil {
-		return err
-	}
-
 	signature, err := os.Open("packdel.sig")
 	if err != nil {
 		return err
 	}
 
-	prfx := "https://"
+	protocol := "https://"
 	if p.Insecure {
-		prfx = "http://"
+		protocol = "http://"
 	}
 
 	req, err := http.NewRequest(
 		http.MethodDelete,
-		prfx+path.Join(remote, "api/packages", owner, "arch/remove"),
+		protocol+path.Join(remote, "api/packages", owner, "arch/remove"),
 		signature,
 	)
 	if err != nil {
@@ -183,7 +178,11 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 
 	var client http.Client
 	resp, err := client.Do(req)
-	err = errors.Join(os.RemoveAll("packdel.sig"), err)
+	err = errors.Join(
+		os.RemoveAll("packdel.sig"),
+		os.RemoveAll("packdel"),
+		err,
+	)
 	if err != nil {
 		return err
 	}

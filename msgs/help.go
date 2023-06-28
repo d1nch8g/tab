@@ -80,7 +80,7 @@ var UtilHelp = `Additional utilities
 options:
         --info    Show information about your GnuPG keys
         --gen     Generate GnuPG key for package singing
-        --armor   Export public GnuPG key armor
+        --export  Export public GnuPG key armor
         --recv    Run recieve key operaion
         --setpkgr Automatically set packager in makepkg.conf
         --flutter Generate PKGBUILD, app.sh and app.desktop for flutter application
