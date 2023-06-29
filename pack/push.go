@@ -170,6 +170,7 @@ func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 	var errbuf bytes.Buffer
 	cmd := exec.Command("gpg", "--detach-sign", "packpush")
 	cmd.Stdout = pp.Stdout
+	cmd.Stdin = pp.Stdin
 	cmd.Stderr = &errbuf
 	err = cmd.Run()
 	if err != nil {
