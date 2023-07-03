@@ -184,13 +184,15 @@ func cloneOrPullDir(outw, errw io.Writer, repo string) (string, error) {
 	if err != nil {
 		return ``, err
 	}
-	err = os.MkdirAll(path.Join(uhd, ".packcache"), os.ModePerm)
+	err = os.MkdirAll(path.Join(uhd, "/tmp/pack"), os.ModePerm)
 	if err != nil {
 		return ``, err
 	}
 	project := ejectLastPathArg(repo)
 	msgs.Amsg(outw, "Cloning repository: "+project)
-	gitdir := path.Join(uhd, ".packcache", project)
+	gitdir := path.Join(uhd, "/tmp/pack", project)
+
+	defer os.RemoveAll(gitdir)
 
 	var errbuf bytes.Buffer
 	cmd := exec.Command("git", "clone", "https://"+repo, gitdir)
