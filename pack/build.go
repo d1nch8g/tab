@@ -112,6 +112,14 @@ func Build(args []string, prms ...BuildParameters) error {
 			return err
 		}
 	}
+
+	for _, dir := range builddirs {
+		err = os.RemoveAll(dir)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -188,7 +196,6 @@ func cloneOrPullDir(outw, errw io.Writer, repo string) (string, error) {
 	project := ejectLastPathArg(repo)
 	msgs.Amsg(outw, "Cloning repository: "+project)
 	gitdir := path.Join(td, "pack", project)
-	defer os.RemoveAll(gitdir)
 
 	var errbuf bytes.Buffer
 	cmd := exec.Command("git", "clone", "https://"+repo, gitdir)
