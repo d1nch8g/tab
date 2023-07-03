@@ -180,18 +180,14 @@ func ejectLastPathArg(s string) string {
 // This function will clone provided repository to cache directory and return
 // name of that directory.
 func cloneOrPullDir(outw, errw io.Writer, repo string) (string, error) {
-	uhd, err := os.UserHomeDir()
-	if err != nil {
-		return ``, err
-	}
-	err = os.MkdirAll(path.Join(uhd, "/tmp/pack"), os.ModePerm)
+	td := os.TempDir()
+	err := os.MkdirAll(path.Join(td, "pack"), os.ModePerm)
 	if err != nil {
 		return ``, err
 	}
 	project := ejectLastPathArg(repo)
 	msgs.Amsg(outw, "Cloning repository: "+project)
-	gitdir := path.Join(uhd, "/tmp/pack", project)
-
+	gitdir := path.Join(td, "pack", project)
 	defer os.RemoveAll(gitdir)
 
 	var errbuf bytes.Buffer
