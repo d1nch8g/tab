@@ -24,18 +24,18 @@ It is required for package signing, run:
 4) Send it to key GPG server:
 ` + color.YellowString("gpg --send-keys KEY-ID") + `
 
-5) Edit ` + color.BlueString("PACKAGER") + ` variable in ` + color.CyanString("/etc/makepkg.conf:129") + `
+5) Edit ` + color.BlueString("PACKAGER") + ` variable in ` + color.CyanString("/etc/makepkg.conf") + `
 Name and email should match with name and email in GnuPG authority for pack to work properly.
 `
 
 var ErrNoPackager = `packager not found.
 
-Add PACKAGER variable matching your GnuPG authority in ` + color.CyanString("/etc/makepkg.conf:129") + `
+Add PACKAGER variable matching your GnuPG authority in ` + color.CyanString("/etc/makepkg.conf") + `
 
 ` + color.BlueString("PACKAGER") + `=` + color.HiMagentaString("John Doe <john@doe.com>\n")
 
 var ErrSignerMissmatch = `signer and packager are different.
 
-Authority you defined in GnuPG is not matching with PACKAGER variable in 
+Authority you defined in GnuPG is not matching with PACKAGER variable in ` + color.CyanString("/etc/makepkg.conf") + `
 
 ` + color.BlueString("PACKAGER") + `=` + color.HiMagentaString("John Doe <john@doe.com>\n")
