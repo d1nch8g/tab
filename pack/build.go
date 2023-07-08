@@ -66,6 +66,7 @@ func Build(args []string, prms ...BuildParameters) error {
 	}
 
 	var builddirs []string
+	var buildcurrdir bool
 
 	if len(args) == 0 {
 		currdir, err := os.Getwd()
@@ -73,6 +74,7 @@ func Build(args []string, prms ...BuildParameters) error {
 			return err
 		}
 		builddirs = append(args, currdir)
+		buildcurrdir = true
 	}
 
 	for _, arg := range args {
@@ -114,9 +116,11 @@ func Build(args []string, prms ...BuildParameters) error {
 	}
 
 	for _, dir := range builddirs {
-		err = os.RemoveAll(dir)
-		if err != nil {
-			return err
+		if !buildcurrdir {
+			err = os.RemoveAll(dir)
+			if err != nil {
+				return err
+			}
 		}
 	}
 
