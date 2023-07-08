@@ -136,13 +136,15 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 		return err
 	}
 
-	err = os.WriteFile("packdel", []byte(owner+target+t), os.ModePerm)
+	const delmd = `delmd`
+
+	err = os.WriteFile(delmd, []byte(owner+target+t), os.ModePerm)
 	if err != nil {
 		return err
 	}
 
 	var errbuf bytes.Buffer
-	cmd := exec.Command("gpg", "--detach-sign", "packdel")
+	cmd := exec.Command("gpg", "--detach-sign", delmd)
 	cmd.Stdout = p.Stdout
 	cmd.Stderr = &errbuf
 	err = cmd.Run()
@@ -150,7 +152,7 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 		return errors.Join(errors.New(errbuf.String()), err)
 	}
 
-	signature, err := os.Open("packdel.sig")
+	signature, err := os.Open(delmd + ".sig")
 	if err != nil {
 		return err
 	}
@@ -179,8 +181,8 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 	var client http.Client
 	resp, err := client.Do(req)
 	err = errors.Join(
-		os.RemoveAll("packdel.sig"),
-		os.RemoveAll("packdel"),
+		os.RemoveAll(delmd+".sig"),
+		os.RemoveAll(delmd),
 		err,
 	)
 	if err != nil {
