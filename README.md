@@ -8,7 +8,7 @@
 [![Generic badge](https://img.shields.io/badge/fmnx-repo-006db0.svg)](https://fmnx.su/core/pack)
 [![Generic badge](https://img.shields.io/badge/codeberg-repo-45a3fb.svg)](https://codeberg.org/fmnx/pack)
 [![Generic badge](https://img.shields.io/badge/github-repo-white.svg)](https://github.com/fmnx-io/pack)
-[![Generic badge](https://img.shields.io/badge/package-0.1.1_alpha-00bcd4.svg)](https://fmnx.su/core/-/packages/arch/pack)
+[![Generic badge](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://fmnx.su/core/-/packages/arch/pack)
 
 Pack works as a wrapper over pacman providing additional functionality for software delivery and connection management.
 
