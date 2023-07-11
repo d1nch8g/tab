@@ -8,6 +8,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"strings"
 
 	"fmnx.su/core/pack/msgs"
@@ -26,7 +27,7 @@ var opts struct {
 	Sync   bool `short:"S" long:"sync"`
 	Push   bool `short:"P" long:"push"`
 	Build  bool `short:"B" long:"build"`
-	Util   bool `short:"U" long:"util"`
+	Assist bool `short:"A" long:"assist"`
 
 	// Sync options.
 	Quick   bool   `short:"q" long:"quick"`
@@ -37,15 +38,15 @@ var opts struct {
 	// Push options.
 	Dir      string `short:"d" long:"dir" default:"/var/cache/pacman/pkg"`
 	Insecure bool   `short:"w" long:"insecure"`
-	Endpoint string `long:"endpoint" default:"/api/packages/arch"`
 	Distro   string `long:"distro" default:"archlinux"`
+	Endpoint string `long:"endpoint" default:"/api/packages/arch"`
 
 	// Remove options.
 	Confirm     bool   `short:"c" long:"confirm"`
 	Norecursive bool   `short:"a" long:"norecursive"`
 	Nocfgs      bool   `short:"j" long:"nocfgs"`
-	Cascade     bool   `long:"cascade"`
-	Arch        string `long:"architecture" default:"x86_64"`
+	Cascade     bool   `short:"k" long:"cascade"`
+	Arch        string `long:"arch" default:"x86_64"`
 
 	// Query options.
 	Info     []bool `short:"i" long:"info"`
@@ -57,9 +58,9 @@ var opts struct {
 	Rmdeps    bool `short:"r" long:"rmdeps"`
 	Garbage   bool `short:"g" long:"garbage"`
 
-	// Util options.
-	Gen     bool `long:"gen"`
-	Exoport bool `long:"export"`
+	// Assist options.
+	Export  bool `short:"e" long:"export"`
+	Gen     bool `short:"n" long:"gen"`
 	Recv    bool `long:"recv"`
 	Setpkgr bool `long:"setpkgr"`
 	Flutter bool `long:"flutter"`
@@ -129,7 +130,6 @@ func run() error {
 			Cascade:     opts.Cascade,
 			Distro:      opts.Distro,
 			Insecure:    opts.Insecure,
-			Arch:        opts.Arch,
 		})
 
 	case opts.Query && opts.Help:
@@ -169,18 +169,19 @@ func run() error {
 			Stdin:     os.Stdin,
 		})
 
-	case opts.Util && opts.Help:
-		fmt.Println(msgs.UtilHelp)
+	case opts.Assist && opts.Help:
+		fmt.Println(msgs.AssistHelp)
 		return nil
 
-	case opts.Util:
-		return pack.Util(args(), pack.UtilParameters{
+	case opts.Assist:
+		return pack.Assist(args(), pack.AssistParameters{
 			Stdout:  os.Stdout,
 			Stderr:  os.Stderr,
 			Stdin:   os.Stdin,
+			Export:  opts.Export,
 			Gen:     opts.Gen,
-			Armor:   opts.Exoport,
 			Recv:    opts.Recv,
+			Info:    len(opts.Info) > 0,
 			Setpkgr: opts.Setpkgr,
 			Flutter: opts.Flutter,
 			Gocli:   opts.Gocli,
@@ -199,14 +200,23 @@ func run() error {
 	}
 }
 
-// This gets list of all arguements and removes command, string args and bool
-// args from list. New string arguements should be added to stringargs variable
-// for command to work properly.
-// TODO: later rewrite with reflect to avoid unexpected behaviour.
+// Function is used to get list of command line arguements.
 func args() []string {
-	var stringargs = []string{
-		"-d", "--dir", "--endpoint", "--distro", "--architecture",
+	var arglist []string
+
+	v := reflect.ValueOf(opts)
+
+	for i := 0; i < v.NumField(); i++ {
+		if v.Field(i).Type().String() == "string" {
+			short := reflect.TypeOf(opts).Field(i).Tag.Get("short")
+			if short != "" {
+				arglist = append(arglist, "-"+short)
+			}
+			long := reflect.TypeOf(opts).Field(i).Tag.Get("long")
+			arglist = append(arglist, "--"+long)
+		}
 	}
+
 	var filtered []string
 	for i, v := range os.Args {
 		if i == 0 || i == 1 {
@@ -215,13 +225,13 @@ func args() []string {
 		if strings.HasPrefix(v, "-") {
 			continue
 		}
-		var next bool
-		for _, args := range stringargs {
+		var skipStringArg bool
+		for _, args := range arglist {
 			if os.Args[i-1] == args {
-				next = true
+				skipStringArg = true
 			}
 		}
-		if next {
+		if skipStringArg {
 			continue
 		}
 		filtered = append(filtered, v)

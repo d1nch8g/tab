@@ -20,8 +20,8 @@ operations:
 	pack {-P --push}   [options] [(registry)/(owner)/package(s)]
 	pack {-R --remove} [options] [(registry)/(owner)/package(s)]
 	pack {-Q --query}  [options] [(registry)/(owner)/package(s)]
-	pack {-B --build}  [options] [(registry)/(owner)/package(s)]
-	pack {-U --util}   [options] [args]
+	pack {-B --build}  [options] [git/repository(s)]
+	pack {-A --assist} [options] [args]
 
 use 'pack {-h --help}' with an operation for available options`
 
@@ -51,7 +51,9 @@ options:
 	-c, --confirm  Ask for confirmation when deleting package
 	-a, --norecurs Leave package dependencies in the system (removed by default)
 	-j, --nocfgs   Leave package configs in the system (removed by default)
-	    --cascade  Remove packages and all packages that depend on them
+	-k, --cascade  Remove packages and all packages that depend on them
+	    --arch     Custom architecture for remote delete operation
+		--distro   Custom distribution for remote delete operation
 
 usage:  pack {-R --remove} [options] <(registry)/(owner)/package(s)>`
 
@@ -73,20 +75,20 @@ options:
 	-r, --rmdeps    Remove installed dependencies after a successful build
 	-g, --garbage   Do not clean workspace before and after build
 
-usage:  pack {-B --build} [options] <(registry)/(owner)/package(s)>`
+usage:  pack {-B --build} [options] <git/repository(s)>`
 
-var UtilHelp = `Additional utilities
+var AssistHelp = `Additional utilities
 
 options:
-        --info    Show information about your GnuPG keys
-        --gen     Generate GnuPG key for package singing
-        --export  Export public GnuPG key armor
-        --recv    Run recieve key operaion
-        --setpkgr Automatically set packager in makepkg.conf
-        --flutter Generate PKGBUILD, app.sh and app.desktop for flutter application
-        --gocli   Generate PKGBUILD for CLI utility in go
+	-e, --export  Export public GnuPG key armor
+	-n, --gen     Generate GnuPG key for package singing
+	    --recv    Run key recieve operaion
+	    --info    Show information about your GnuPG keys
+	    --setpkgr Automatically set packager in makepkg.conf
+	    --flutter Generate PKGBUILD, app.sh and app.desktop for flutter application
+	    --gocli   Generate PKGBUILD for CLI utility in go
 
-usage:  pack {-U --util} [options] <(args)>`
+usage:  pack {-A --assist} [options] <(args)>`
 
 var Version = `             Pack - package manager.
           Copyright (C) 2023 FMNX team

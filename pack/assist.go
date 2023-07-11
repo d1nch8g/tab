@@ -17,17 +17,19 @@ import (
 )
 
 // Parameters for util.
-type UtilParameters struct {
+type AssistParameters struct {
 	Stdout io.Writer
 	Stderr io.Writer
 	Stdin  io.Reader
 
+	// Export existing GnuPG key armored string.
+	Export bool
 	// Generate GnuPG key.
 	Gen bool
-	// Export existing GnuPG key armored string.
-	Armor bool
 	// Run gpg --recv-key to avoid pacman signing problems.
 	Recv bool
+	// Get info about existing GnuPG keys.
+	Info bool
 	// Set packager in pacman.conf
 	Setpkgr bool
 	// Generate flutter template.
@@ -36,36 +38,38 @@ type UtilParameters struct {
 	Gocli bool
 }
 
-func utildefault() *UtilParameters {
-	return &UtilParameters{
+func utildefault() *AssistParameters {
+	return &AssistParameters{
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 		Stdin:  os.Stdin,
 	}
 }
 
-func Util(args []string, prms ...UtilParameters) error {
+func Assist(args []string, prms ...AssistParameters) error {
 	p := formOptions(prms, utildefault)
 
 	switch {
-	case p.Recv:
-		return recv(args[0], p)
-	case p.Setpkgr:
-		return setpkgr(args[0], p)
+	case p.Export:
+		return exparmor(p.Stdout)
 	case p.Gen:
 		return generate(p)
-	case p.Armor:
-		return armored(p.Stdout)
+	case p.Setpkgr:
+		return setpkgr(args[0], p)
+	case p.Recv:
+		return recv(args[0], p)
+	case p.Info:
+		return info(p.Stdout)
 	case p.Flutter:
 		return fluttertemplate()
 	case p.Gocli:
 		return goclitemplate()
 	}
-	return errors.New("specify command options, run 'pack -Uh'")
+	return errors.New("specify assist option, run 'pack -Ah'")
 }
 
 // Add packager line to makepkg.conf
-func setpkgr(pkgr string, p *UtilParameters) error {
+func setpkgr(pkgr string, p *AssistParameters) error {
 	c := fmt.Sprintf("echo PACKAGER='%s' >> /etc/makepkg.conf", pkgr)
 	cmd := exec.Command("bash", "-c", c)
 	cmd.Stdout = p.Stdout
@@ -75,7 +79,7 @@ func setpkgr(pkgr string, p *UtilParameters) error {
 }
 
 // Recieve gpg key.
-func recv(id string, p *UtilParameters) error {
+func recv(id string, p *AssistParameters) error {
 	cmd := exec.Command("gpg", "--recv-key", id)
 	cmd.Stdout = p.Stdout
 	cmd.Stderr = p.Stderr
@@ -84,7 +88,7 @@ func recv(id string, p *UtilParameters) error {
 }
 
 // Generate new GPG key with user input and etc.
-func generate(p *UtilParameters) error {
+func generate(p *AssistParameters) error {
 	cmd := exec.Command("gpg", "--armor", "--export")
 	cmd.Stdout = p.Stdout
 	cmd.Stderr = p.Stderr
@@ -92,9 +96,16 @@ func generate(p *UtilParameters) error {
 	return cmd.Run()
 }
 
-// Return armored public key string from GnuPG.
-func armored(o io.Writer) error {
+// Return exparmor public key string from GnuPG.
+func exparmor(o io.Writer) error {
 	cmd := exec.Command("gpg", "--armor", "--export")
+	cmd.Stdout = o
+	return call(cmd)
+}
+
+// Get information about current keys.
+func info(o io.Writer) error {
+	cmd := exec.Command("gpg", "-k")
 	cmd.Stdout = o
 	return call(cmd)
 }

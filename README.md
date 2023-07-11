@@ -14,8 +14,6 @@ Pack works as a wrapper over pacman providing additional functionality for softw
 
 For users pack provides ability to install packages from any compatible registry using package URL. For developers pack is offering simple interface for quick package delivery.
 
-Share and install software without any intermediate regulator.
-
 ---
 
 ### Installation
@@ -26,100 +24,82 @@ Single line installation script for all arch based distributions:
 git clone https://fmnx.su/core/pack && cd pack && makepkg -sfri --needed --noconfirm
 ```
 
-Alternatively, you can install pack with `go`:
-
-```sh
-go install fmnx.su/core/pack
-```
-
 ---
 
 ### Operations
 
-1. Sync packages - operation that you use to install packages to the system. You can mix packages with and without registries in command input. This command will add missing registries to `pacman.conf` and try to syncronize packages with pacman.
+1. Sync packages - operation that you use to install packages to the system.
 
 ```sh
-Syncronize packages
-
-options:
-	-q, --quick       Do not ask for any confirmation (noconfirm shortcut)
-	-y, --refresh     Download fresh package databases from the server (-yy force)
-	-u, --upgrade     Upgrade installed packages (-uu enables downgrade)
-	-f, --force       Reinstall up to date targets
-
-usage:  pack {-S --sync} [options] <(registry)/(owner)/package(s)>
+pack -Sy nano blender example.com/owner/package
 ```
 
-2. Push packages - operation that you use to deliver your software to any pack registry (standalone registry or gitea). Registry parameter is required, owner paarameter is optional.
+You can mix packages with and without registries in input. This command will add missing registries to `pacman.conf` and try to syncronize packages with pacman. Flags for operation:
+
+- `-q`, `--quick` - Do not ask for any confirmation (noconfirm shortcut)
+- `-y`, `--refresh` - Download fresh package databases from the server (-yy force)
+- `-u`, `--upgrade` - Upgrade installed packages (-uu enables downgrade)
+- `-f`, `--force` - Reinstall up to date targets
+
+2. Query packages - operation that you use to inspect the state of your system or view package parameters.
 
 ```sh
-Push packages
-
-options:
-        -d, --dir <dir> Use custom source dir with packages (default pacman cache)
-        -w, --insecure  Push package over HTTP instead of HTTPS
-            --distro    Assign custom distribution in registry (default archlinux)
-            --endpoint  Use custom API endpoints rootpath
-
-usage:  pack {-P --push} [options] <registry/(owner)/package(s)>
+pack -Qi pacman
 ```
 
-3. Remove packages - this operation will remove packages from system or remote depending on provided arguement. If reigsty and owner are provided, then remote deletion will be executed, otherwise package will be deleted on local system.
+- `-i`, `--info` - View package information (-ii for backup files)
+- `-l`, `--list` - List the files owned by the queried package
+- `-o`, `--outdated` - List outdated packages
+
+3. Remove packages - this operation will remove packages from system or registry. By default removes local packages, if you provide registry remote deletion will be executed. When removing remote packages provide version after @.
 
 ```sh
-Remove packages
-
-options:
-        -o, --confirm  Ask for confirmation when deleting package
-        -a, --norecurs Leave package dependencies in the system (removed by default)
-        -w, --nocfgs   Leave package configs in the system (removed by default)
-            --cascade  Remove packages and all packages that depend on them
-
-usage:  pack {-R --remove} [options] <package(s)>
+pack -R vim
+pack -R example.com/owner/package@1-1
 ```
 
-4. Query packages - this command can be executed to get information about local or remote packages. For targets without registry and owner specified local description will be provided, for targets with registry remote information.
-<!-- If you want to search for a package on remote, just put @ before target package -->
+- `-o`, `--confirm` - Ask for confirmation when deleting package
+- `-a`, `--norecurs` - Leave package dependencies in the system (removed by default)
+- `-w`, `--nocfgs` - Leave package configs in the system (removed by default)
+- `-k`, `--cascade` - Remove packages and all packages that depend on them
+- `--arch` - Custom architecture for remote delete operation
+- `--distro` - Custom distribution for remote delete operation
+
+4. Build packages - command that you use to build packages. If you provide git repo(s) in args, this command will clone and build them.
 
 ```sh
-Query packages
-
-options:
-        -i, --info     View package information (-ii for backup files)
-        -l, --list     List the files owned by the queried package
-        -o, --outdated List outdated packages
-
-usage:  pack {-Q --query} [options] <(registry)/(owner)/package(s)>
+pack -B aur.archlinux.org/veloren-bin aur.archlinux.org/onlyoffice-bin
 ```
 
-5. Build packages - command that will build package in current directory if no arguements provided, otherwise it will treat packages as git repositories, clone them to `~/.packcache` directory, build and remove directory afterwards.
+After successful build prepared packages are stored in `/var/cache/pacman/pkg`. Delete flags:
+
+- `-q`, `--quick` - Do not ask for any confirmation (noconfirm)
+- `-d`, `--dir` _directory_ - Use custom dir to cache built package (default /var/cache/pacman/pkg)
+- `-s`, `--syncbuild` - Syncronize dependencies and build target
+- `-r`, `--rmdeps` - Remove installed dependencies after a successful build
+- `-g`, `--garbage` - Do not clean workspace before and after build
+
+5.  Push packages - operation that you use to deliver your software to any pack registry (currently standalone registry or gitea).
 
 ```sh
-Build package
-
-options:
-        -q, --quick     Do not ask for any confirmation (noconfirm)
-        -d, --dir <dir> Use custom dir to store result (default /var/cache/pacman/pkg)
-        -s, --syncbuild Syncronize dependencies and build target
-        -r, --rmdeps    Remove installed dependencies after a successful build
-        -g, --garbage   Do not clean workspace before and after build
-
-usage:  pack {-B --build} [options] <(registry)/(owner)/package(s)>
+pack -P fmnx.su/core/onlyoffice-bin
 ```
 
-6. Util - small assistant that can generate generate tempaltes or help with GnuPG related operations.
+- `-w`, `--insecure` - Push package over HTTP instead of HTTPS
+- `-d`, `--dir` _directory_ - Use custom source dir with packages (default pacman cache)
+- `--distro` - Assign custom distribution in registry (default archlinux)
+- `--endpoint` - Use custom API endpoints rootpath
+
+6. Assist - generate project tempaltes, export [GnuPG](https://gnupg.org/) keys, set packages, etc...
 
 ```sh
-Additional utilities
-
-options:
-        --info    Show information about your GnuPG keys
-        --gen     Generate GnuPG key for package singing
-        --export   Export public GnuPG key armor
-        --recv    Run recieve key operaion
-        --setpkgr Automatically set packager in makepkg.conf
-        --flutter Generate PKGBUILD, app.sh and app.desktop for flutter application
-        --gocli   Generate PKGBUILD for CLI utility in go
-
-usage:  pack {-U --util} [options] <(args)>
+pack -A
 ```
+
+- `--export`- Export public [GnuPG](https://gnupg.org/) key armor
+- `--info`- Show information about your [GnuPG](https://gnupg.org/) keys
+- `--gen`- Generate [GnuPG](https://gnupg.org/) key for package singing
+- `--recv`- Run recieve key operaion
+- `--setpkgr`- Automatically set packager in `makepkg.conf`
+- `--flutter`- Generate `PKGBUILD`, `app.sh` and `app.desktop` for flutter application
+- `--gocli`- Generate `PKGBUILD` for CLI utility in go
