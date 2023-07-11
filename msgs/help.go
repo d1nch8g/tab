@@ -109,13 +109,4 @@ func init() {
 	if !Color {
 		color.NoColor = true
 	}
-	if Color {
-		Help = strings.Join([]string{"📦", Help}, " ")
-		QueryHelp = strings.Join([]string{"🔎", QueryHelp}, " ")
-		RemoveHelp = strings.Join([]string{"📍", RemoveHelp}, " ")
-		SyncHelp = strings.Join([]string{"⚡", SyncHelp}, " ")
-		PushHelp = strings.Join([]string{"🚀", PushHelp}, " ")
-		BuildHelp = strings.Join([]string{"🔐", BuildHelp}, " ")
-		UtilHelp = strings.Join([]string{"📄", UtilHelp}, " ")
-	}
 }

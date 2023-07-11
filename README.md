@@ -39,7 +39,7 @@ go install fmnx.su/core/pack
 1. Sync packages - operation that you use to install packages to the system. You can mix packages with and without registries in command input. This command will add missing registries to `pacman.conf` and try to syncronize packages with pacman.
 
 ```sh
-⚡ Syncronize packages
+Syncronize packages
 
 options:
 	-q, --quick       Do not ask for any confirmation (noconfirm shortcut)
@@ -53,7 +53,7 @@ usage:  pack {-S --sync} [options] <(registry)/(owner)/package(s)>
 2. Push packages - operation that you use to deliver your software to any pack registry (standalone registry or gitea). Registry parameter is required, owner paarameter is optional.
 
 ```sh
-🚀 Push packages
+Push packages
 
 options:
         -d, --dir <dir> Use custom source dir with packages (default pacman cache)
@@ -67,7 +67,7 @@ usage:  pack {-P --push} [options] <registry/(owner)/package(s)>
 3. Remove packages - this operation will remove packages from system or remote depending on provided arguement. If reigsty and owner are provided, then remote deletion will be executed, otherwise package will be deleted on local system.
 
 ```sh
-📍 Remove packages
+Remove packages
 
 options:
         -o, --confirm  Ask for confirmation when deleting package
@@ -82,7 +82,7 @@ usage:  pack {-R --remove} [options] <package(s)>
 <!-- If you want to search for a package on remote, just put @ before target package -->
 
 ```sh
-🔎 Query packages
+Query packages
 
 options:
         -i, --info     View package information (-ii for backup files)
@@ -95,7 +95,7 @@ usage:  pack {-Q --query} [options] <(registry)/(owner)/package(s)>
 5. Build packages - command that will build package in current directory if no arguements provided, otherwise it will treat packages as git repositories, clone them to `~/.packcache` directory, build and remove directory afterwards.
 
 ```sh
-🔐 Build package
+Build package
 
 options:
         -q, --quick     Do not ask for any confirmation (noconfirm)
@@ -110,7 +110,7 @@ usage:  pack {-B --build} [options] <(registry)/(owner)/package(s)>
 6. Util - small assistant that can generate generate tempaltes or help with GnuPG related operations.
 
 ```sh
-📄 Additional utilities
+Additional utilities
 
 options:
         --info    Show information about your GnuPG keys
