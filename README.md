@@ -106,3 +106,9 @@ pack -A
 - `--setpkgr`- Automatically set packager in `makepkg.conf`
 - `--flutter`- Generate `PKGBUILD`, `app.sh` and `app.desktop` for flutter application
 - `--gocli`- Generate `PKGBUILD` for CLI utility in go
+
+---
+
+## Registry
+
+You can set up personal registry for arch packages with docker or using arch package.

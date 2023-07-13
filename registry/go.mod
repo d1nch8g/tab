@@ -6,6 +6,7 @@ require (
 	fmnx.su/core/pack v0.0.0-20230711095405-c4a96ab79749
 	github.com/caarlos0/env/v9 v9.0.0
 	github.com/gorilla/mux v1.8.0
+	github.com/jessevdk/go-flags v1.5.0
 	github.com/keybase/go-crypto v0.0.0-20200123153347-de78d2cb44f4
 	github.com/mholt/archiver/v3 v3.5.1
 	github.com/syndtr/goleveldb v1.0.0

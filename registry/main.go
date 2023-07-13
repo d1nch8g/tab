@@ -15,15 +15,19 @@ import (
 	"fmnx.su/core/pack/registry/database/leveldb"
 	"fmnx.su/core/pack/registry/handlers"
 	"github.com/caarlos0/env/v9"
+	"github.com/jessevdk/go-flags"
 )
 
 var cfg struct {
-	Name    string `env:"PACK_REGISTRY_NAME"`
-	Port    string `env:"PACK_REGISTRY_PORT"`
-	DbDir   string `env:"PACK_REGISTRY_DB_DIR"`
-	GpgDir  string `env:"PACK_REGISTRY_GPG_DIR"`
-	TlsCert string `env:"PACK_REGISTRY_TLS_CERT"`
-	TlsKey  string `env:"PACK_REGISTRY_TLS_KEY"`
+	Help    bool `long:"help" short:"h"`
+	Version bool `long:"version" short:"v"`
+
+	Name    string `env:"PACK_REGISTRY_NAME" short:"n" long:"name"`
+	Port    string `env:"PACK_REGISTRY_PORT" short:"p" long:"port"`
+	DbDir   string `env:"PACK_REGISTRY_DB_DIR" short:"d" long:"dbdir"`
+	GpgDir  string `env:"PACK_REGISTRY_GPG_DIR" short:"g" long:"gpgdir"`
+	TlsCert string `env:"PACK_REGISTRY_TLS_CERT" short:"c" long:"cert"`
+	TlsKey  string `env:"PACK_REGISTRY_TLS_KEY" short:"k" long:"key"`
 }
 
 func main() {
@@ -35,7 +39,12 @@ func main() {
 }
 
 func run() error {
-	err := env.Parse(&cfg)
+	_, err := flags.NewParser(&cfg, flags.None).Parse()
+	if err != nil {
+		return err
+	}
+
+	err = env.Parse(&cfg)
 	if err != nil {
 		return err
 	}
@@ -99,3 +108,24 @@ func run() error {
 	}
 	return server.ListenAndServe()
 }
+
+const Help = `Simplified version of pacman
+
+operations:
+	pack {-S --sync}   [options] [(registry)/(owner)/package(s)]
+	pack {-P --push}   [options] [(registry)/(owner)/package(s)]
+	pack {-R --remove} [options] [(registry)/(owner)/package(s)]
+	pack {-Q --query}  [options] [(registry)/(owner)/package(s)]
+	pack {-B --build}  [options] [git/repository(s)]
+	pack {-A --assist} [options] [args]
+
+use 'pack {-h --help}' with an operation for available options`
+
+const Version = `         Pack registry for arch packages
+          Copyright (C) 2023 FMNX team
+     
+  This program may be freely redistributed under
+   the terms of the GNU General Public License.
+       Web page: https://fmnx.su/core/pack
+ 
+                 Version: 0.1.2`
