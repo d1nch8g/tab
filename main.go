@@ -200,7 +200,8 @@ func run() error {
 	}
 }
 
-// Function is used to get list of command line arguements.
+// Function to get list of command line arguements. It automatically filters
+// all string CLI parameters with reflect.
 func args() []string {
 	var arglist []string
 

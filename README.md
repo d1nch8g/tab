@@ -4,11 +4,14 @@
 
 <h2 align="center">Pack - package manager</h2>
 
+![Generic badge](https://img.shields.io/badge/status-alpha-red.svg)
 [![Generic badge](https://img.shields.io/badge/license-gpl-orange.svg)](https://fmnx.su/core/pack/src/branch/main/LICENSE)
 [![Generic badge](https://img.shields.io/badge/fmnx-repo-006db0.svg)](https://fmnx.su/core/pack)
 [![Generic badge](https://img.shields.io/badge/codeberg-repo-45a3fb.svg)](https://codeberg.org/fmnx/pack)
 [![Generic badge](https://img.shields.io/badge/github-repo-white.svg)](https://github.com/fmnx-io/pack)
 [![Generic badge](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://fmnx.su/core/-/packages/arch/pack)
+
+> **Warning!** Project is in alpha stage, API's are very likely to be changed.
 
 Pack works as a wrapper over pacman providing additional functionality for software delivery and connection management.
 
@@ -96,9 +99,9 @@ pack -P fmnx.su/core/onlyoffice-bin
 pack -A
 ```
 
-- `--export`- Export public [GnuPG](https://gnupg.org/) key armor
+- `-e`, `--export`- Export public [GnuPG](https://gnupg.org/) key armor
+- `-n`, `--gen`- Generate [GnuPG](https://gnupg.org/) key for package singing
 - `--info`- Show information about your [GnuPG](https://gnupg.org/) keys
-- `--gen`- Generate [GnuPG](https://gnupg.org/) key for package singing
 - `--recv`- Run recieve key operaion
 - `--setpkgr`- Automatically set packager in `makepkg.conf`
 - `--flutter`- Generate `PKGBUILD`, `app.sh` and `app.desktop` for flutter application
