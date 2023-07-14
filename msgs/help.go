@@ -53,7 +53,7 @@ options:
 	-j, --nocfgs   Leave package configs in the system (removed by default)
 	-k, --cascade  Remove packages and all packages that depend on them
 	    --arch     Custom architecture for remote delete operation
-		--distro   Custom distribution for remote delete operation
+	    --distro   Custom distribution for remote delete operation
 
 usage:  pack {-R --remove} [options] <(registry)/(owner)/package(s)>`
 
@@ -81,10 +81,7 @@ var AssistHelp = `Additional utilities
 
 options:
 	-e, --export  Export public GnuPG key armor
-	-n, --gen     Generate GnuPG key for package singing
-	    --recv    Run key recieve operaion
-	    --info    Show information about your GnuPG keys
-	    --setpkgr Automatically set packager in makepkg.conf
+	-x, --fix     Check/fix compatability of identities in git, gpg and makepkg.
 	    --flutter Generate PKGBUILD, app.sh and app.desktop for flutter application
 	    --gocli   Generate PKGBUILD for CLI utility in go
 
@@ -99,16 +96,13 @@ var Version = `             Pack - package manager.
  
                  Version: 0.1.2`
 
-var Color bool
-
 func init() {
 	b, err := os.ReadFile("/etc/pacman.conf")
 	if err != nil {
 		fmt.Println("unable to read pacman configuration")
 		os.Exit(1)
 	}
-	Color = strings.Contains(string(b), "\nColor\n")
-	if !Color {
+	if !strings.Contains(string(b), "\nColor\n") {
 		color.NoColor = true
 	}
 }

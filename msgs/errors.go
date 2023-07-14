@@ -30,12 +30,28 @@ Name and email should match with name and email in GnuPG authority for pack to w
 
 var ErrNoPackager = `packager not found.
 
-Add PACKAGER variable matching your GnuPG authority in ` + color.CyanString("/etc/makepkg.conf") + `
+Add ` + color.BlueString("PACKAGER") + ` variable matching your GnuPG authority in ` + color.CyanString("/etc/makepkg.conf") + `
 
-` + color.BlueString("PACKAGER") + `=` + color.HiMagentaString("John Doe <john@doe.com>\n")
+` + color.BlueString("PACKAGER") + `=` + color.HiGreenString("%s")
 
-var ErrSignerMissmatch = `signer and packager are different.
+var ErrPackagerMissmatch = `signer and packager identities are different.
 
-Authority you defined in GnuPG is not matching with PACKAGER variable in ` + color.CyanString("/etc/makepkg.conf") + `
+Your GnuPG authority: ` + color.HiGreenString("%s") + `
+Your makepkg authority: ` + color.HiCyanString("%s") + `
 
-` + color.BlueString("PACKAGER") + `=` + color.HiMagentaString("John Doe <john@doe.com>\n")
+Authority you defined in GnuPG is not matching with ` + color.BlueString("PACKAGER") + ` variable in ` + color.CyanString("/etc/makepkg.conf")
+
+var ErrGitUserMissmatch = `git and gnupg identities are different.
+
+Your GnuPG authority: ` + color.HiGreenString("%s") + `
+Your Git authority: ` + color.HiCyanString("%s") + `
+
+Make sure, that ` + color.HiRedString("user.name") + ` and ` + color.HiRedString("user.email") + ` in ` + color.CyanString("~/.gitconfig") + ` are matching GnuPG name and email.`
+
+var ErrGitSignKeyMissmatch = `git signing key does not exist in GnuPG.
+
+Git signing key: ` + color.HiCyanString("%s") + `
+
+You can check your gpg identity with command: ` + color.BlueString("gpg -K") + `
+
+Make sure, that ` + color.HiRedString("user.signingkey") + ` matches key in ` + color.CyanString("~/.gitconfig")

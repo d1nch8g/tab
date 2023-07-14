@@ -24,14 +24,8 @@ type AssistParameters struct {
 
 	// Export existing GnuPG key armored string.
 	Export bool
-	// Generate GnuPG key.
-	Gen bool
-	// Run gpg --recv-key to avoid pacman signing problems.
-	Recv bool
-	// Get info about existing GnuPG keys.
-	Info bool
-	// Set packager in pacman.conf
-	Setpkgr bool
+	// Check compatability of identities across git, gpg and makepkg.
+	Fix bool
 	// Generate flutter template.
 	Flutter bool
 	// Generate go cli utility template.
@@ -51,69 +45,89 @@ func Assist(args []string, prms ...AssistParameters) error {
 
 	switch {
 	case p.Export:
-		return exparmor(p.Stdout)
-	case p.Gen:
-		return generate(p)
-	case p.Setpkgr:
-		return setpkgr(args[0], p)
-	case p.Recv:
-		return recv(args[0], p)
-	case p.Info:
-		return info(p.Stdout)
+		return Export(p.Stdout, p.Stderr)
+	case p.Fix:
+		return fix()
 	case p.Flutter:
-		return fluttertemplate()
+		return FlutterTemplate()
 	case p.Gocli:
-		return goclitemplate()
+		return GoCliTemplate()
 	}
+
 	return errors.New("specify assist option, run 'pack -Ah'")
 }
 
-// Add packager line to makepkg.conf
-func setpkgr(pkgr string, p *AssistParameters) error {
-	c := fmt.Sprintf("echo PACKAGER='%s' >> /etc/makepkg.conf", pkgr)
-	cmd := exec.Command("bash", "-c", c)
-	cmd.Stdout = p.Stdout
-	cmd.Stderr = p.Stderr
-	cmd.Stdin = p.Stdin
-	return cmd.Run()
-}
-
-// Recieve gpg key.
-func recv(id string, p *AssistParameters) error {
-	cmd := exec.Command("gpg", "--recv-key", id)
-	cmd.Stdout = p.Stdout
-	cmd.Stderr = p.Stderr
-	cmd.Stdin = p.Stdin
-	return cmd.Run()
-}
-
-// Generate new GPG key with user input and etc.
-func generate(p *AssistParameters) error {
-	cmd := exec.Command("gpg", "--armor", "--export")
-	cmd.Stdout = p.Stdout
-	cmd.Stderr = p.Stderr
-	cmd.Stdin = p.Stdin
-	return cmd.Run()
-}
-
-// Return exparmor public key string from GnuPG.
-func exparmor(o io.Writer) error {
-	cmd := exec.Command("gpg", "--armor", "--export")
+// Export public GPG key, which can be added to gitea/gitlab/github.
+func Export(o io.Writer, e io.Writer) error {
+	ident, err := GnuPGidentity()
+	if err != nil {
+		return err
+	}
+	gpgemail := strings.Replace(strings.Split(ident, " <")[1], ">", "", 1)
+	cmd := exec.Command("gpg", "--armor", "--export", gpgemail)
 	cmd.Stdout = o
-	return call(cmd)
+	cmd.Stderr = e
+	return cmd.Run()
 }
 
-// Get information about current keys.
-func info(o io.Writer) error {
-	cmd := exec.Command("gpg", "-k")
-	cmd.Stdout = o
-	return call(cmd)
+// Check/fix compatability of identities in git, gpg and makepkg.
+func fix() error {
+	err := ValidatePackager()
+	if err != nil {
+		return err
+	}
+
+	err = ValidateGitUser()
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func ValidateGitUser() error {
+	gitname, err := callOut("git", "config", "user.name")
+	if err != nil {
+		return err
+	}
+
+	gitemail, err := callOut("git", "config", "user.email")
+	if err != nil {
+		return err
+	}
+
+	gitidentity := gitname + " <" + gitemail + ">"
+
+	gpgidentity, err := GnuPGidentity()
+	if err != nil {
+		return err
+	}
+
+	if gpgidentity != gitidentity {
+		return fmt.Errorf(msgs.ErrGitUserMissmatch, gpgidentity, gitidentity)
+	}
+
+	gitsignkey, err := callOut("git", "config", "user.signingkey")
+	if err != nil {
+		return err
+	}
+
+	gpginfo, err := callOut("gpg", "-K")
+	if err != nil {
+		return err
+	}
+
+	if !strings.Contains(gpginfo, gitsignkey) {
+		return fmt.Errorf(msgs.ErrGitSignKeyMissmatch, gitsignkey)
+	}
+
+	return nil
 }
 
 // Function generates project template for flutter desktop application based on
 // current directory name and identity in GnuPG.
-func fluttertemplate() error {
-	ident, err := gnuPGIdentity()
+func FlutterTemplate() error {
+	ident, err := GnuPGidentity()
 	if err != nil {
 		return err
 	}
@@ -139,8 +153,8 @@ func fluttertemplate() error {
 
 // Function generates project template for go cli utility based on
 // current directory name and identity in GnuPG.
-func goclitemplate() error {
-	ident, err := gnuPGIdentity()
+func GoCliTemplate() error {
+	ident, err := GnuPGidentity()
 	if err != nil {
 		return err
 	}

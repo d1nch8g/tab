@@ -60,9 +60,7 @@ var opts struct {
 
 	// Assist options.
 	Export  bool `short:"e" long:"export"`
-	Gen     bool `short:"n" long:"gen"`
-	Recv    bool `long:"recv"`
-	Setpkgr bool `long:"setpkgr"`
+	Fix     bool `short:"x" long:"fix"`
 	Flutter bool `long:"flutter"`
 	Gocli   bool `long:"gocli"`
 }
@@ -179,10 +177,7 @@ func run() error {
 			Stderr:  os.Stderr,
 			Stdin:   os.Stdin,
 			Export:  opts.Export,
-			Gen:     opts.Gen,
-			Recv:    opts.Recv,
-			Info:    len(opts.Info) > 0,
-			Setpkgr: opts.Setpkgr,
+			Fix:     opts.Fix,
 			Flutter: opts.Flutter,
 			Gocli:   opts.Gocli,
 		})
@@ -237,5 +232,6 @@ func args() []string {
 		}
 		filtered = append(filtered, v)
 	}
+
 	return filtered
 }

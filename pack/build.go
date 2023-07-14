@@ -8,6 +8,7 @@ package pack
 import (
 	"bytes"
 	"errors"
+	"fmt"
 	"io"
 	"os"
 	"os/exec"
@@ -47,20 +48,20 @@ func builddefault() *BuildParameters {
 	}
 }
 
-// Build package in current directory with provided arguements
+// Build package in current directory with provided arguements.
 func Build(args []string, prms ...BuildParameters) error {
 	p := formOptions(prms, builddefault)
 
 	msgs.Amsg(p.Stdout, "Building packages")
 
 	msgs.Smsg(p.Stdout, "Running GnuPG check", 1, 2)
-	err := checkGnupg()
+	err := CheckGnuPG()
 	if err != nil {
 		return err
 	}
 
 	msgs.Smsg(p.Stdout, "Validating packager identity", 2, 2)
-	err = validatePackager()
+	err = ValidatePackager()
 	if err != nil {
 		return err
 	}
@@ -78,7 +79,7 @@ func Build(args []string, prms ...BuildParameters) error {
 	}
 
 	for _, arg := range args {
-		dir, err := cloneOrPullDir(p.Stdout, p.Stderr, arg)
+		dir, err := CloneOrPullDir(p.Stdout, p.Stderr, arg)
 		if err != nil {
 			return err
 		}
@@ -107,9 +108,7 @@ func Build(args []string, prms ...BuildParameters) error {
 		}
 
 		msgs.Amsg(p.Stdout, "Moving package to cache")
-		movecommand := "sudo mv " + dir + "/*.pkg.tar.zst* " + p.Dir
-		cmd := exec.Command("bash", "-c", movecommand)
-		err = call(cmd)
+		err = CachePackage(dir, p.Dir)
 		if err != nil {
 			return err
 		}
@@ -129,7 +128,7 @@ func Build(args []string, prms ...BuildParameters) error {
 
 // Ensure, that user have created gnupg keys for package signing before package
 // is built and cached.
-func checkGnupg() error {
+func CheckGnuPG() error {
 	hd, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -148,8 +147,8 @@ func checkGnupg() error {
 
 // Validate, that packager defined in /etc/makepkg.conf matches signer
 // authority in GnuPG.
-func validatePackager() error {
-	keySigner, err := gnuPGIdentity()
+func ValidatePackager() error {
+	keySigner, err := GnuPGidentity()
 	if err != nil {
 		return err
 	}
@@ -159,45 +158,66 @@ func validatePackager() error {
 	}
 	splt := strings.Split(string(f), "\nPACKAGER=\"")
 	if len(splt) != 2 {
-		return errors.New(msgs.ErrNoPackager)
+		return fmt.Errorf(msgs.ErrNoPackager, keySigner)
 	}
 	confPackager := strings.Split(splt[1], "\"\n")[0]
 	if confPackager != keySigner {
-		return errors.New(msgs.ErrSignerMissmatch)
+		return fmt.Errorf(msgs.ErrPackagerMissmatch, keySigner, confPackager)
 	}
 	return nil
 }
 
 // Returns name and email from GnuPG. Error, if did not succeed.
-func gnuPGIdentity() (string, error) {
-	gnukey := `gpg --with-colons -k | awk -F: '$1=="uid" {print $10; exit}'`
-	cmd := exec.Command("bash", "-c", gnukey)
+func GnuPGidentity() (string, error) {
+	cmd := exec.Command("gpg", "-K")
 	var b bytes.Buffer
 	cmd.Stdout = &b
 	cmd.Stderr = &b
 	err := cmd.Run()
 	if err != nil {
-		o := b.String()
-		return ``, errors.New("unable to get gnupg identity: " + o)
+		return ``, errors.New("unable to get gnupg identity: " + b.String())
 	}
-	return strings.ReplaceAll(b.String(), "\n", ""), nil
+	splt := strings.Split(b.String(), "[ultimate] ")
+	if len(splt) < 2 {
+		return ``, errors.New("insufficient gpg -K output, unable to get uid")
+	}
+	return strings.Split(splt[1], "\n")[0], nil
+}
+
+// Move package and signature files to cache location defined by user.
+func CachePackage(src, dst string) error {
+	entries, err := os.ReadDir(src)
+	if err != nil {
+		return err
+	}
+	for _, de := range entries {
+		if strings.HasSuffix(de.Name(), ".pkg.tar.zst") ||
+			strings.HasSuffix(de.Name(), ".pkg.tar.zst.sig") {
+			cmd := exec.Command("sudo", "mv", path.Join(src, de.Name()), dst)
+			err = call(cmd)
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 // Eject last name from directory or link.
-func ejectLastPathArg(s string) string {
+func EjectLastPathArg(s string) string {
 	splt := strings.Split(s, "/")
 	return splt[len(splt)-1]
 }
 
 // This function will clone provided repository to cache directory and return
 // name of that directory.
-func cloneOrPullDir(outw, errw io.Writer, repo string) (string, error) {
+func CloneOrPullDir(outw, errw io.Writer, repo string) (string, error) {
 	td := os.TempDir()
 	err := os.MkdirAll(path.Join(td, "pack"), os.ModePerm)
 	if err != nil {
 		return ``, err
 	}
-	project := ejectLastPathArg(repo)
+	project := EjectLastPathArg(repo)
 	msgs.Amsg(outw, "Cloning repository: "+project)
 	gitdir := path.Join(td, "pack", project)
 

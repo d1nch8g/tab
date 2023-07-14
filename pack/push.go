@@ -79,7 +79,7 @@ func Push(args []string, prms ...PushParameters) error {
 
 // This function will be used to get email from user's GnuPG identitry.
 func gnupgEmail() (string, error) {
-	gnupgident, err := gnuPGIdentity()
+	gnupgident, err := GnuPGidentity()
 	if err != nil {
 		return ``, err
 	}

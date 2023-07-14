@@ -13,7 +13,7 @@
 
 > **Warning!** Project is in alpha stage, API's are very likely to be changed.
 
-Pack works as a wrapper over pacman providing additional functionality for software delivery and connection management.
+Pack works as a wrapper over pacman providing additional functionality for software delivery and pacman database management.
 
 For users pack provides ability to install packages from any compatible registry using package URL. For developers pack is offering simple interface for quick package delivery.
 
@@ -99,16 +99,7 @@ pack -P fmnx.su/core/onlyoffice-bin
 pack -A
 ```
 
-- `-e`, `--export`- Export public [GnuPG](https://gnupg.org/) key armor
-- `-n`, `--gen`- Generate [GnuPG](https://gnupg.org/) key for package singing
-- `--info`- Show information about your [GnuPG](https://gnupg.org/) keys
-- `--recv`- Run recieve key operaion
-- `--setpkgr`- Automatically set packager in `makepkg.conf`
-- `--flutter`- Generate `PKGBUILD`, `app.sh` and `app.desktop` for flutter application
-- `--gocli`- Generate `PKGBUILD` for CLI utility in go
-
----
-
-## Registry
-
-You can set up personal registry for arch packages with docker or using arch package.
+- `-e`, `--export` - Export public GnuPG key armor
+- `-x`, `--fix` - Check/fix compatability of identities in git, gpg and makepkg.
+- `--flutter` - Generate PKGBUILD, app.sh and app.desktop for flutter application
+- `--gocli` - Generate PKGBUILD for CLI utility in go
