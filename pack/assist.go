@@ -47,7 +47,7 @@ func Assist(args []string, prms ...AssistParameters) error {
 	case p.Export:
 		return Export(p.Stdout, p.Stderr)
 	case p.Fix:
-		return fix()
+		return Fix()
 	case p.Flutter:
 		return FlutterTemplate()
 	case p.Gocli:
@@ -70,8 +70,8 @@ func Export(o io.Writer, e io.Writer) error {
 	return cmd.Run()
 }
 
-// Check/fix compatability of identities in git, gpg and makepkg.
-func fix() error {
+// Check/Fix compatability of identities in git, gpg and makepkg.
+func Fix() error {
 	err := ValidatePackager()
 	if err != nil {
 		return err
@@ -88,12 +88,12 @@ func fix() error {
 func ValidateGitUser() error {
 	gitname, err := callOut("git", "config", "user.name")
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to get git name")
 	}
 
 	gitemail, err := callOut("git", "config", "user.email")
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to get git email")
 	}
 
 	gitidentity := gitname + " <" + gitemail + ">"
@@ -109,7 +109,7 @@ func ValidateGitUser() error {
 
 	gitsignkey, err := callOut("git", "config", "user.signingkey")
 	if err != nil {
-		return err
+		return fmt.Errorf("unable to get git signingkey")
 	}
 
 	gpginfo, err := callOut("gpg", "-K")
