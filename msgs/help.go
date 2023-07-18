@@ -19,7 +19,7 @@ operations:
 	pack {-S --sync}   [options] [(registry)/(owner)/package(s)]
 	pack {-P --push}   [options] [(registry)/(owner)/package(s)]
 	pack {-R --remove} [options] [(registry)/(owner)/package(s)]
-	pack {-Q --query}  [options] [(registry)/(owner)/package(s)]
+	pack {-Q --query}  [options] [(database)/package(s)]
 	pack {-B --build}  [options] [git/repository(s)]
 	pack {-A --assist} [options] [args]
 

@@ -13,7 +13,6 @@ import (
 
 	"fmnx.su/core/pack/msgs"
 	"fmnx.su/core/pack/pack"
-	"fmnx.su/core/pack/pacman"
 	"github.com/jessevdk/go-flags"
 )
 
@@ -135,20 +134,13 @@ func run() error {
 		return nil
 
 	case opts.Query:
-		if opts.Outdated {
-			return pacman.Query(nil, pacman.QueryParameters{
-				Stdout:  os.Stdout,
-				Stderr:  os.Stderr,
-				Stdin:   os.Stdin,
-				Upgrade: true,
-			})
-		}
-		return pacman.Query(args(), pacman.QueryParameters{
-			Info:   opts.Info,
-			List:   opts.List,
-			Stdout: os.Stdout,
-			Stderr: os.Stderr,
-			Stdin:  os.Stdin,
+		return pack.Query(args(), pack.QueryParameters{
+			Stdout:   os.Stdout,
+			Stderr:   os.Stderr,
+			Stdin:    os.Stdin,
+			Outdated: opts.Outdated,
+			Info:     opts.Info,
+			List:     opts.List,
 		})
 
 	case opts.Build && opts.Help:
