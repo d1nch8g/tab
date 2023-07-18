@@ -9,6 +9,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"fmnx.su/core/pack/sudo"
 )
 
 // Options to apply when searching for some package.
@@ -76,7 +78,7 @@ func UpgradeList(files []string, opts ...UpgradeParameters) error {
 	args = append(args, o.AdditionalParams...)
 	args = append(args, files...)
 
-	cmd := sudoCommand(o.Sudo, pacman, args...)
+	cmd := sudo.Command(o.Sudo, pacman, args...)
 	cmd.Stdout = o.Stdout
 	cmd.Stderr = o.Stderr
 	cmd.Stdin = o.Stdin

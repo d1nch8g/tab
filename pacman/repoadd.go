@@ -9,6 +9,8 @@ import (
 	"io"
 	"os"
 	"sync"
+
+	"fmnx.su/core/pack/sudo"
 )
 
 // Parameters for adding packages to pacman repo.
@@ -87,7 +89,7 @@ func RepoAdd(dbfile, pkgfile string, opts ...RepoAddParameters) error {
 	args = append(args, dbfile)
 	args = append(args, pkgfile)
 
-	cmd := sudoCommand(o.Sudo, repoadd, args...)
+	cmd := sudo.Command(o.Sudo, repoadd, args...)
 	cmd.Dir = o.Dir
 	cmd.Stderr = o.Stderr
 	cmd.Stdout = o.Stdout

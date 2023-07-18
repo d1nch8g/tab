@@ -6,11 +6,10 @@
 package pacman
 
 import (
-	"os/exec"
 	"sync"
 )
 
-// Dependecy packages.
+// Used commands.
 const (
 	pacman  = `pacman`
 	makepkg = `makepkg`
@@ -25,12 +24,4 @@ func formOptions[Options any](arr []Options, getdefault func() *Options) *Option
 		return getdefault()
 	}
 	return &arr[0]
-}
-
-func sudoCommand(sudo bool, command string, args ...string) *exec.Cmd {
-	if sudo {
-		args = append([]string{command}, args...)
-		return exec.Command(`sudo`, args...)
-	}
-	return exec.Command(command, args...)
 }

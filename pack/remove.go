@@ -136,15 +136,15 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 		return err
 	}
 
-	const delmd = `delmd`
+	const tmpMetadataFile = `tmpmd`
 
-	err = os.WriteFile(delmd, []byte(owner+target+t), os.ModePerm)
+	err = os.WriteFile(tmpMetadataFile, []byte(owner+target+t), os.ModePerm)
 	if err != nil {
 		return err
 	}
 
 	var errbuf bytes.Buffer
-	cmd := exec.Command("gpg", "--detach-sign", delmd)
+	cmd := exec.Command("gpg", "--detach-sign", tmpMetadataFile)
 	cmd.Stdout = p.Stdout
 	cmd.Stderr = &errbuf
 	err = cmd.Run()
@@ -152,7 +152,7 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 		return errors.Join(errors.New(errbuf.String()), err)
 	}
 
-	signature, err := os.Open(delmd + ".sig")
+	signature, err := os.Open(tmpMetadataFile + ".sig")
 	if err != nil {
 		return err
 	}
@@ -181,8 +181,8 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 	var client http.Client
 	resp, err := client.Do(req)
 	err = errors.Join(
-		os.RemoveAll(delmd+".sig"),
-		os.RemoveAll(delmd),
+		os.RemoveAll(tmpMetadataFile+".sig"),
+		os.RemoveAll(tmpMetadataFile),
 		err,
 	)
 	if err != nil {

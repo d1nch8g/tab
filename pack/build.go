@@ -17,6 +17,7 @@ import (
 
 	"fmnx.su/core/pack/msgs"
 	"fmnx.su/core/pack/pacman"
+	"fmnx.su/core/pack/sudo"
 )
 
 // Parameters that can be used to build packages.
@@ -193,7 +194,7 @@ func CachePackage(src, dst string) error {
 	for _, de := range entries {
 		if strings.HasSuffix(de.Name(), ".pkg.tar.zst") ||
 			strings.HasSuffix(de.Name(), ".pkg.tar.zst.sig") {
-			cmd := exec.Command("sudo", "mv", path.Join(src, de.Name()), dst)
+			cmd := sudo.Command(true, "mv", path.Join(src, de.Name()), dst)
 			err = call(cmd)
 			if err != nil {
 				return err

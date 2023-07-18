@@ -9,6 +9,8 @@ import (
 	"io"
 	"os"
 	"strings"
+
+	"fmnx.su/core/pack/sudo"
 )
 
 // Optional parameters for pacman remove command.
@@ -71,7 +73,7 @@ func RemoveList(pkgs []string, opts ...RemoveParameters) error {
 	args = append(args, o.AdditionalParams...)
 	args = append(args, pkgs...)
 
-	cmd := sudoCommand(o.Sudo, pacman, args...)
+	cmd := sudo.Command(o.Sudo, pacman, args...)
 	cmd.Stdout = o.Stdout
 	cmd.Stderr = o.Stderr
 	cmd.Stdin = o.Stdin

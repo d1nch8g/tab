@@ -1,18 +1,19 @@
 # Maintainer: Danila Fominykh <dancheg97@fmnx.su>
 
 pkgname=pack
-pkgver='0.1.3'
+pkgver='0.1.4'
 pkgrel=1
 pkgdesc="Decentralized package manager based on pacman."
 arch=('x86_64')
 url="https://fmnx.su/core/pack"
 license=('GPL')
 depends=(
-  'bash'
-  'sudo'
   'pacman'
-  'gnupg'
-  'git'
+)
+optdepends=(
+  'git: build remote repositories'
+  'sudo: privilege elevation'
+  'doas: privilege elevation'
 )
 makedepends=('go')
 

@@ -162,15 +162,15 @@ func listPkgFilenames(dir string) ([]string, error) {
 func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 	tm := time.Now().Format(time.RFC3339)
 
-	const pushmd = `pushmd`
+	const tmpMetadataFile = `tmpmd`
 
-	err := os.WriteFile(pushmd, []byte(md.Owner+md.Name+tm), os.ModePerm)
+	err := os.WriteFile(tmpMetadataFile, []byte(md.Owner+md.Name+tm), os.ModePerm)
 	if err != nil {
 		return err
 	}
 
 	var errbuf bytes.Buffer
-	cmd := exec.Command("gpg", "--detach-sign", pushmd)
+	cmd := exec.Command("gpg", "--detach-sign", tmpMetadataFile)
 	cmd.Stdout = pp.Stdout
 	cmd.Stdin = pp.Stdin
 	cmd.Stderr = &errbuf
@@ -179,7 +179,7 @@ func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 		return errors.Join(errors.New(errbuf.String()), err)
 	}
 
-	metasign, err := os.ReadFile(pushmd + ".sig")
+	metasign, err := os.ReadFile(tmpMetadataFile + ".sig")
 	if err != nil {
 		return err
 	}
@@ -235,8 +235,8 @@ func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 	var client http.Client
 	resp, err := client.Do(req)
 	err = errors.Join(
-		os.RemoveAll(pushmd+".sig"),
-		os.RemoveAll(pushmd),
+		os.RemoveAll(tmpMetadataFile+".sig"),
+		os.RemoveAll(tmpMetadataFile),
 		err,
 	)
 	if err != nil {
