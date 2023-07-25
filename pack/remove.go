@@ -6,17 +6,15 @@
 package pack
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
-	"time"
 
+	"fmnx.su/core/pack/creds"
 	"fmnx.su/core/pack/msgs"
 	"fmnx.su/core/pack/pacman"
 )
@@ -129,62 +127,41 @@ func splitVer(pkg string) (string, string, error) {
 
 // Function that will be used to remove remote package.
 func rmRemote(p *RemoveParameters, pkg, email string) error {
-	t := time.Now().Format(time.RFC3339)
-
 	remote, owner, target, version, err := splitPkg(pkg)
 	if err != nil {
 		return err
 	}
 
-	const tmpMetadataFile = `tmpmd`
-
-	err = os.WriteFile(tmpMetadataFile, []byte(owner+target+t), os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	var errbuf bytes.Buffer
-	cmd := exec.Command("gpg", "--detach-sign", tmpMetadataFile)
-	cmd.Stdout = p.Stdout
-	cmd.Stderr = &errbuf
-	err = cmd.Run()
-	if err != nil {
-		return errors.Join(errors.New(errbuf.String()), err)
-	}
-
-	signature, err := os.Open(tmpMetadataFile + ".sig")
-	if err != nil {
-		return err
-	}
-
-	protocol := "https://"
+	protocol := "https"
 	if p.Insecure {
 		protocol = "http://"
 	}
 
 	req, err := http.NewRequest(
 		http.MethodDelete,
-		protocol+path.Join(remote, "api/packages", owner, "arch/remove"),
-		signature,
+		protocol+"://"+path.Join(remote, "api/packages", owner, "arch/remove"),
+		nil,
 	)
 	if err != nil {
 		return err
 	}
 
-	req.Header.Add("email", email)
 	req.Header.Add("distro", p.Distro)
 	req.Header.Add("target", target)
-	req.Header.Add("time", t)
 	req.Header.Add("version", version)
-	req.Header.Add("arch", p.Arch)
+
+	login, pass, err := creds.Get(protocol, remote)
+	if err != nil {
+		login, pass, err = creds.Create(protocol, remote, p.Stdin, p.Stdout)
+		if err != nil {
+			return err
+		}
+	}
+
+	req.SetBasicAuth(login, pass)
 
 	var client http.Client
 	resp, err := client.Do(req)
-	err = errors.Join(
-		os.RemoveAll(tmpMetadataFile+".sig"),
-		os.RemoveAll(tmpMetadataFile),
-		err,
-	)
 	if err != nil {
 		return err
 	}

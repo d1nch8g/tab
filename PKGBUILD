@@ -1,7 +1,7 @@
 # Maintainer: Danila Fominykh <dancheg97@fmnx.su>
 
 pkgname=pack
-pkgver='0.1.4'
+pkgver='0.1.5'
 pkgrel=1
 pkgdesc="Decentralized package manager based on pacman."
 arch=('x86_64')

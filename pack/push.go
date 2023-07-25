@@ -6,18 +6,16 @@
 package pack
 
 import (
-	"bytes"
 	"encoding/hex"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
-	"time"
 
+	"fmnx.su/core/pack/creds"
 	"fmnx.su/core/pack/msgs"
 	"github.com/mitchellh/ioprogress"
 )
@@ -89,7 +87,7 @@ func gnupgEmail() (string, error) {
 type PackageMetadata struct {
 	Name     string
 	FileName string
-	Registry string
+	Addr     string
 	Owner    string
 }
 
@@ -104,10 +102,10 @@ func prepareMetadata(dir string, filenames, pkgs []string) ([]PackageMetadata, e
 		case 1:
 			return nil, errors.New("no registry to push: " + pkg)
 		case 2:
-			md.Registry = splt[0]
+			md.Addr = splt[0]
 			md.Name = splt[1]
 		case 3:
-			md.Registry = splt[0]
+			md.Addr = splt[0]
 			md.Owner = splt[1]
 			md.Name = splt[2]
 		}
@@ -159,32 +157,8 @@ func listPkgFilenames(dir string) ([]string, error) {
 }
 
 // This function pushes package to registry via http/https.
-func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
-	tm := time.Now().Format(time.RFC3339)
-
-	const tmpMetadataFile = `tmpmd`
-
-	err := os.WriteFile(tmpMetadataFile, []byte(md.Owner+md.Name+tm), os.ModePerm)
-	if err != nil {
-		return err
-	}
-
-	var errbuf bytes.Buffer
-	cmd := exec.Command("gpg", "--detach-sign", tmpMetadataFile)
-	cmd.Stdout = pp.Stdout
-	cmd.Stdin = pp.Stdin
-	cmd.Stderr = &errbuf
-	err = cmd.Run()
-	if err != nil {
-		return errors.Join(errors.New(errbuf.String()), err)
-	}
-
-	metasign, err := os.ReadFile(tmpMetadataFile + ".sig")
-	if err != nil {
-		return err
-	}
-
-	pkgpath := path.Join(pp.Directory, md.FileName)
+func push(pp PushParameters, m PackageMetadata, email string, i, t int) error {
+	pkgpath := path.Join(pp.Directory, m.FileName)
 	packagefile, err := os.Open(pkgpath)
 	if err != nil {
 		return err
@@ -199,14 +173,14 @@ func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 		return err
 	}
 
-	protocol := "https://"
+	protocol := "https"
 	if pp.Insecure {
-		protocol = "http://"
+		protocol = "http"
 	}
 
 	req, err := http.NewRequest(
 		http.MethodPut,
-		protocol+path.Join(md.Registry, "api/packages", md.Owner, "arch/push"),
+		protocol+"://"+path.Join(m.Addr, "api/packages", m.Owner, "arch/push"),
 		&ioprogress.Reader{
 			Reader: packagefile,
 			Size:   pkgInfo.Size(),
@@ -214,8 +188,8 @@ func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 				Current: i,
 				Total:   t,
 				Msg: fmt.Sprintf(
-					"Pushing %s to %s...", md.Name,
-					path.Join(md.Registry, md.Owner),
+					"Pushing %s to %s...", m.Name,
+					path.Join(m.Addr, m.Owner),
 				),
 				Output: pp.Stdout,
 			}),
@@ -225,20 +199,23 @@ func push(pp PushParameters, md PackageMetadata, email string, i, t int) error {
 		return err
 	}
 
-	req.Header.Add("filename", md.FileName)
+	req.Header.Add("filename", m.FileName)
 	req.Header.Add("email", email)
 	req.Header.Add("distro", pp.Distro)
-	req.Header.Add("time", tm)
 	req.Header.Add("pkgsign", hex.EncodeToString(pkgsign))
-	req.Header.Add("metasign", hex.EncodeToString(metasign))
+
+	login, pass, err := creds.Get(protocol, m.Addr)
+	if err != nil {
+		login, pass, err = creds.Create(protocol, m.Addr, pp.Stdin, pp.Stdout)
+		if err != nil {
+			return err
+		}
+	}
+
+	req.SetBasicAuth(login, pass)
 
 	var client http.Client
 	resp, err := client.Do(req)
-	err = errors.Join(
-		os.RemoveAll(tmpMetadataFile+".sig"),
-		os.RemoveAll(tmpMetadataFile),
-		err,
-	)
 	if err != nil {
 		return err
 	}
