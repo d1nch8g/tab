@@ -202,7 +202,7 @@ func push(pp PushParameters, m PackageMetadata, email string, i, t int) error {
 	req.Header.Add("filename", m.FileName)
 	req.Header.Add("email", email)
 	req.Header.Add("distro", pp.Distro)
-	req.Header.Add("pkgsign", hex.EncodeToString(pkgsign))
+	req.Header.Add("sign", hex.EncodeToString(pkgsign))
 
 	login, pass, err := creds.Get(protocol, m.Addr)
 	if err != nil {
