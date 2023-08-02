@@ -35,7 +35,7 @@ options:
 
 usage:  pack {-S --sync} [options] <(registry)/(owner)/package(s)>`
 
-var PushHelp = `Push packages
+var PushHelp = `Push cached packages
 
 options:
 	-d, --dir <dir> Use custom source dir with packages (default pacman cache)

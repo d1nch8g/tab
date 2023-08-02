@@ -80,49 +80,55 @@ type PackageMetadata struct {
 func prepareMetadata(dir string, filenames, pkgs []string) ([]PackageMetadata, error) {
 	var mds []PackageMetadata
 	for _, pkg := range pkgs {
-		md := PackageMetadata{}
+		var (
+			name    string
+			owner   string
+			address string
+		)
 
 		splt := strings.Split(pkg, "/")
 		switch len(splt) {
 		case 1:
 			return nil, errors.New("no registry to push: " + pkg)
 		case 2:
-			md.Addr = splt[0]
-			md.Name = splt[1]
+			address = splt[0]
+			name = splt[1]
 		case 3:
-			md.Addr = splt[0]
-			md.Owner = splt[1]
-			md.Name = splt[2]
+			address = splt[0]
+			owner = splt[1]
+			name = splt[2]
 		}
 
-		var err error
-		md.FileName, err = getLastverCachedPkgFile(md.Name, filenames)
+		filenames, err := FilterFilenames(filenames, name)
 		if err != nil {
 			return nil, err
 		}
-
-		mds = append(mds, md)
+		for _, filename := range filenames {
+			mds = append(mds, PackageMetadata{
+				Name:     name,
+				FileName: filename,
+				Addr:     address,
+				Owner:    owner,
+			})
+		}
 	}
 	return mds, nil
 }
 
-// Get lastet package from list based on package name.
-func getLastverCachedPkgFile(pkg string, files []string) (string, error) {
-	for i := len(files) - 1; i >= 0; i-- {
-		filename := files[i]
-		if !strings.HasPrefix(filename, pkg) {
-			continue
-		}
+// Filter filenames related to required package.
+func FilterFilenames(filenames []string, pkg string) ([]string, error) {
+	var rez []string
+	for _, filename := range filenames {
 		pkgsplt := strings.Split(filename, "-")
 		if len(pkgsplt) < 4 {
-			return ``, errors.New("not valid package file name: " + filename)
+			return nil, errors.New("not valid package file name: " + filename)
 		}
 		if !(strings.Join(pkgsplt[:len(pkgsplt)-3], "-") == pkg) {
 			continue
 		}
-		return filename, nil
+		rez = append(rez, filename)
 	}
-	return ``, errors.New("cannot find package in cache: " + pkg)
+	return rez, nil
 }
 
 // List file names in provided cache directory.
@@ -176,7 +182,7 @@ func push(pp PushParameters, m PackageMetadata, i, t int) error {
 				Current: i,
 				Total:   t,
 				Msg: fmt.Sprintf(
-					"Pushing %s to %s...", m.Name,
+					"Pushing %s to %s...", m.FileName,
 					path.Join(m.Addr, m.Owner),
 				),
 				Output: pp.Stdout,
