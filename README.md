@@ -65,8 +65,6 @@ pack -R for example.com/owner/package@1-1
 - `-a`, `--norecurs` - Leave package dependencies in the system (removed by default)
 - `-w`, `--nocfgs` - Leave package configs in the system (removed by default)
 - `-k`, `--cascade` - Remove packages and all packages that depend on them
-- `--arch` - Custom architecture for remote delete operation
-- `--distro` - Custom distribution for remote delete operation
 
 4. Build packages - command that you use to build packages. If you provide git repo(s) in arguments, this command will clone and build them.
 
@@ -91,7 +89,6 @@ pack -P fmnx.su/core/onlyoffice-bin
 - `-w`, `--insecure` - Push package over HTTP instead of HTTPS
 - `-d`, `--dir` _directory_ - Use custom source directory with packages (default pacman cache)
 - `--distro` - Assign custom distribution in registry (default archlinux)
-- `--endpoint` - Use custom API endpoints root path
 
 6. Assist - generate project templates, export [GnuPG](https://gnupg.org/) keys, set packages, etc...
 
@@ -103,9 +100,3 @@ pack -A
 - `-x`, `--fix` - Check/fix compatibility of identities in git, gpg and makepkg.
 - `--flutter` - Generate PKGBUILD, app.sh and app.desktop for flutter application
 - `--gocli` - Generate PKGBUILD for CLI utility in go
-
-<!--
-r.Put("/push/{filename}/{distro}/{sign}", arch.Push, reqPackageAccess(perm.AccessModeWrite))
-r.Delete("/remove/{package}/{version}", arch.Remove, reqPackageAccess(perm.AccessModeWrite))
-r.Get("/{distro}/{arch}/{file}", arch.Get)
--->
