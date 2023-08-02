@@ -32,12 +32,8 @@ type RemoveParameters struct {
 	Nocfgs bool
 	// Remove packages and all packages that depend on them.
 	Cascade bool
-	// Custom distribution name that will be used for package deletion.
-	Distro string
 	// Use insecure connection for remote deletions.
 	Insecure bool
-	// Set custom architectures for deletion.
-	Arch string
 }
 
 func removeDefault() *RemoveParameters {
@@ -45,8 +41,6 @@ func removeDefault() *RemoveParameters {
 		Stdout: os.Stdout,
 		Stderr: os.Stderr,
 		Stdin:  os.Stdin,
-		Distro: "archlinux",
-		Arch:   "x86_64",
 	}
 }
 
@@ -72,17 +66,10 @@ func Remove(args []string, prms ...RemoveParameters) error {
 	}
 
 	if len(remote) > 0 {
-		email, err := gnupgEmail()
-		if err != nil {
-			return err
-		}
-		if p.Distro == "" {
-			p.Distro = "archlinux"
-		}
-		msgs.Amsg(p.Stdout, "Removing remote packages as "+email)
+		msgs.Amsg(p.Stdout, "Removing remote packages")
 		for i, pkg := range remote {
 			msgs.Smsg(p.Stdout, "Removing "+pkg, i+1, len(remote))
-			err := rmRemote(p, pkg, email)
+			err := rmRemote(p, pkg)
 			if err != nil {
 				return err
 			}
@@ -126,7 +113,7 @@ func splitVer(pkg string) (string, string, error) {
 }
 
 // Function that will be used to remove remote package.
-func rmRemote(p *RemoveParameters, pkg, email string) error {
+func rmRemote(p *RemoveParameters, pkg string) error {
 	remote, owner, target, version, err := splitPkg(pkg)
 	if err != nil {
 		return err
@@ -139,16 +126,15 @@ func rmRemote(p *RemoveParameters, pkg, email string) error {
 
 	req, err := http.NewRequest(
 		http.MethodDelete,
-		protocol+"://"+path.Join(remote, "api/packages", owner, "arch/remove"),
+		protocol+"://"+path.Join(
+			remote, "api/packages", owner,
+			"arch/remove", target, version,
+		),
 		nil,
 	)
 	if err != nil {
 		return err
 	}
-
-	req.Header.Add("distro", p.Distro)
-	req.Header.Add("target", target)
-	req.Header.Add("version", version)
 
 	login, pass, err := creds.Get(protocol, remote)
 	if err != nil {

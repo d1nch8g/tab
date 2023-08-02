@@ -103,3 +103,9 @@ pack -A
 - `-x`, `--fix` - Check/fix compatibility of identities in git, gpg and makepkg.
 - `--flutter` - Generate PKGBUILD, app.sh and app.desktop for flutter application
 - `--gocli` - Generate PKGBUILD for CLI utility in go
+
+<!--
+r.Put("/push/{filename}/{distro}/{sign}", arch.Push, reqPackageAccess(perm.AccessModeWrite))
+r.Delete("/remove/{package}/{version}", arch.Remove, reqPackageAccess(perm.AccessModeWrite))
+r.Get("/{distro}/{arch}/{file}", arch.Get)
+-->

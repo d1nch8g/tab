@@ -47,12 +47,6 @@ func Push(args []string, prms ...PushParameters) error {
 
 	msgs.Amsg(p.Stdout, "Preparing pushed packages")
 
-	email, err := gnupgEmail()
-	if err != nil {
-		return err
-	}
-	msgs.Smsg(p.Stdout, "Pushing as: "+email, 1, 3)
-
 	cachedpkgs, err := listPkgFilenames(p.Directory)
 	if err != nil {
 		return err
@@ -67,21 +61,12 @@ func Push(args []string, prms ...PushParameters) error {
 
 	msgs.Amsg(p.Stdout, "Pushing packages")
 	for i, md := range mds {
-		err = push(*p, md, email, i+1, len(mds))
+		err = push(*p, md, i+1, len(mds))
 		if err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-// This function will be used to get email from user's GnuPG identitry.
-func gnupgEmail() (string, error) {
-	gnupgident, err := GnuPGidentity()
-	if err != nil {
-		return ``, err
-	}
-	return strings.ReplaceAll(strings.Split(gnupgident, "<")[1], ">", ""), nil
 }
 
 type PackageMetadata struct {
@@ -142,22 +127,22 @@ func getLastverCachedPkgFile(pkg string, files []string) (string, error) {
 
 // List file names in provided cache directory.
 func listPkgFilenames(dir string) ([]string, error) {
-	des, err := os.ReadDir(dir)
+	entries, err := os.ReadDir(dir)
 	if err != nil {
 		return nil, errors.New("unable to get directory contents: " + dir)
 	}
 	var fns []string
-	for _, de := range des {
-		fn := de.Name()
-		if strings.HasSuffix(fn, ".pkg.tar.zst") {
-			fns = append(fns, fn)
+	for _, direntry := range entries {
+		filename := direntry.Name()
+		if strings.HasSuffix(filename, ".pkg.tar.zst") {
+			fns = append(fns, filename)
 		}
 	}
 	return fns, nil
 }
 
 // This function pushes package to registry via http/https.
-func push(pp PushParameters, m PackageMetadata, email string, i, t int) error {
+func push(pp PushParameters, m PackageMetadata, i, t int) error {
 	pkgpath := path.Join(pp.Directory, m.FileName)
 	packagefile, err := os.Open(pkgpath)
 	if err != nil {
@@ -180,7 +165,10 @@ func push(pp PushParameters, m PackageMetadata, email string, i, t int) error {
 
 	req, err := http.NewRequest(
 		http.MethodPut,
-		protocol+"://"+path.Join(m.Addr, "api/packages", m.Owner, "arch/push"),
+		protocol+"://"+path.Join(
+			m.Addr, "api/packages", m.Owner, "arch/push",
+			m.FileName, pp.Distro, hex.EncodeToString(pkgsign),
+		),
 		&ioprogress.Reader{
 			Reader: packagefile,
 			Size:   pkgInfo.Size(),
@@ -198,11 +186,6 @@ func push(pp PushParameters, m PackageMetadata, email string, i, t int) error {
 	if err != nil {
 		return err
 	}
-
-	req.Header.Add("filename", m.FileName)
-	req.Header.Add("email", email)
-	req.Header.Add("distro", pp.Distro)
-	req.Header.Add("sign", hex.EncodeToString(pkgsign))
 
 	login, pass, err := creds.Get(protocol, m.Addr)
 	if err != nil {

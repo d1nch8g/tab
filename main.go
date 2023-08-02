@@ -38,14 +38,12 @@ var opts struct {
 	Dir      string `short:"d" long:"dir" default:"/var/cache/pacman/pkg"`
 	Insecure bool   `short:"w" long:"insecure"`
 	Distro   string `long:"distro" default:"archlinux"`
-	Endpoint string `long:"endpoint" default:"/api/packages/arch"`
 
 	// Remove options.
-	Confirm     bool   `short:"c" long:"confirm"`
-	Norecursive bool   `short:"a" long:"norecursive"`
-	Nocfgs      bool   `short:"j" long:"nocfgs"`
-	Cascade     bool   `short:"k" long:"cascade"`
-	Arch        string `long:"arch" default:"x86_64"`
+	Confirm     bool `short:"c" long:"confirm"`
+	Norecursive bool `short:"a" long:"norecursive"`
+	Nocfgs      bool `short:"j" long:"nocfgs"`
+	Cascade     bool `short:"k" long:"cascade"`
 
 	// Query options.
 	Info     []bool `short:"i" long:"info"`
@@ -101,7 +99,6 @@ func run() error {
 		fmt.Println(msgs.PushHelp)
 		return nil
 
-	// TODO: when multiple architectures found in cache push them all.
 	case opts.Push:
 		return pack.Push(args(), pack.PushParameters{
 			Stdout:    os.Stdout,
@@ -125,7 +122,6 @@ func run() error {
 			Norecursive: opts.Norecursive,
 			Nocfgs:      opts.Nocfgs,
 			Cascade:     opts.Cascade,
-			Distro:      opts.Distro,
 			Insecure:    opts.Insecure,
 		})
 

@@ -41,9 +41,8 @@ options:
 	-d, --dir <dir> Use custom source dir with packages (default pacman cache)
 	-w, --insecure  Push package over HTTP instead of HTTPS
 	    --distro    Assign custom distribution in registry (default archlinux)
-	    --endpoint  Use custom API endpoints rootpath
 
-usage:  pack {-P --push} [options] <registry/(owner)/package(s)>`
+usage:  pack {-P --push} [options] <registry/owner/package(s)>`
 
 var RemoveHelp = `Remove packages
 
@@ -52,8 +51,6 @@ options:
 	-a, --norecurs Leave package dependencies in the system (removed by default)
 	-j, --nocfgs   Leave package configs in the system (removed by default)
 	-k, --cascade  Remove packages and all packages that depend on them
-	    --arch     Custom architecture for remote delete operation
-	    --distro   Custom distribution for remote delete operation
 
 usage:  pack {-R --remove} [options] <(registry)/(owner)/package(s)>`
 
@@ -94,7 +91,7 @@ var Version = `             Pack - package manager.
    the terms of the GNU General Public License.
        Web page: https://fmnx.su/core/pack
  
-                 Version: 0.1.5`
+                 Version: 0.1.6`
 
 func init() {
 	b, err := os.ReadFile("/etc/pacman.conf")
