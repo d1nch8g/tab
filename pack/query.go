@@ -6,9 +6,6 @@
 package pack
 
 import (
-	"bytes"
-	"errors"
-	"fmt"
 	"io"
 	"os"
 
@@ -49,24 +46,13 @@ func Query(args []string, prms ...QueryParameters) error {
 			return err
 		}
 
-		var b bytes.Buffer
-		err = pacman.Query(nil, pacman.QueryParameters{
-			Stdout:  &b,
-			Stderr:  &b,
-			Stdin:   &b,
+		msgs.Amsg(p.Stdout, "Outdated packages")
+		return pacman.Query(nil, pacman.QueryParameters{
+			Stdout:  p.Stdout,
+			Stderr:  p.Stderr,
+			Stdin:   p.Stdin,
 			Upgrade: true,
 		})
-		if err != nil && b.String() == "" {
-			msgs.Amsg(p.Stdout, "System up to date")
-			return nil
-		}
-		if err != nil {
-			msgs.Amsg(p.Stdout, "Unable to get outdated packages")
-			return errors.New(b.String())
-		}
-		msgs.Amsg(p.Stdout, "Outdated packages")
-		fmt.Println(b.String())
-		return nil
 	}
 
 	return pacman.Query(args, pacman.QueryParameters{
