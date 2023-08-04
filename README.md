@@ -11,7 +11,7 @@
 [![](https://img.shields.io/badge/github-repo-white.svg)](https://github.com/fmnx-su/pack)
 [![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://fmnx.su/core/-/packages/arch/pack)
 
-> **Warning!** The project is in the alpha stage, so APIs are very likely to be changed.
+> **Warning!** The project is in early alpha so APIs might be changed.
 
 Pack works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management.
 
