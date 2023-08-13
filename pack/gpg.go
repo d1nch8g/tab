@@ -41,10 +41,13 @@ func Gpg(args []string, prms ...GpgParameters) error {
 		return Export(p)
 	case p.Gitkey:
 		return SetGit(args, p)
-
+	case p.Privid:
+		return Privid(p)
+	case p.Pubring:
+		return Pubring(p)
 	}
 
-	return nil
+	return errors.ErrUnsupported
 }
 
 // Export public GPG key, which can be added to gitea/gitlab/github.
@@ -67,6 +70,24 @@ func SetGit(args []string, p *GpgParameters) error {
 		return errors.New("provide key string as arguement")
 	}
 	cmd := exec.Command("git", "--config", "--global", "user.signingkey", args[0])
+	cmd.Stdout = p.Stdout
+	cmd.Stderr = p.Stderr
+	cmd.Stdin = p.Stdin
+	return cmd.Run()
+}
+
+// List private gpg key IDs.
+func Privid(p *GpgParameters) error {
+	cmd := exec.Command("gpg", "-K")
+	cmd.Stdout = p.Stdout
+	cmd.Stderr = p.Stderr
+	cmd.Stdin = p.Stdin
+	return cmd.Run()
+}
+
+// List public gpg IDs.
+func Pubring(p *GpgParameters) error {
+	cmd := exec.Command("gpg", "-k")
 	cmd.Stdout = p.Stdout
 	cmd.Stderr = p.Stderr
 	cmd.Stdin = p.Stdin

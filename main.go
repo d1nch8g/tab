@@ -27,7 +27,7 @@ var opts struct {
 	Push   bool `short:"P" long:"push"`
 	Build  bool `short:"B" long:"build"`
 	Gpg    bool `short:"G" long:"gpg"`
-	Tmpl   bool `short:"T" long:"templates"`
+	Tmpl   bool `short:"T" long:"tmpl"`
 
 	// Sync options.
 	Quick   bool   `short:"q" long:"quick"`
@@ -60,7 +60,7 @@ var opts struct {
 	Export  bool `short:"e" long:"export"`
 	Private bool `short:"p" long:"privid"`
 	Gitkey  bool `short:"x" long:"gitid"`
-	Pubring bool `short:"p" long:"pubring"`
+	Pubring bool `short:"n" long:"pubring"`
 
 	// Templates options.
 	Default bool `short:"t" long:"default"`
@@ -167,26 +167,25 @@ func run() error {
 
 	case opts.Gpg:
 		return pack.Gpg(args(), pack.GpgParameters{
-			Stdout:  nil,
-			Stderr:  nil,
-			Stdin:   nil,
-			Export:  opts.Export,
-			Git:     opts.Gitkey,
-			Privid:  opts.Private,
-			Pubring: opts.Pubring,
-		})
-
-	case opts.Assist && opts.Help:
-		fmt.Println(msgs.GpgHelp)
-		return nil
-
-	case opts.Assist:
-		return pack.Assist(args(), pack.AssistParameters{
 			Stdout:  os.Stdout,
 			Stderr:  os.Stderr,
 			Stdin:   os.Stdin,
 			Export:  opts.Export,
-			Fix:     opts.Fix,
+			Gitkey:  opts.Gitkey,
+			Privid:  opts.Private,
+			Pubring: opts.Pubring,
+		})
+
+	case opts.Tmpl && opts.Help:
+		fmt.Println(msgs.TmplHelp)
+		return nil
+
+	case opts.Tmpl:
+		return pack.Tmpl(args(), pack.TmplParameters{
+			Stdout:  os.Stdout,
+			Stderr:  os.Stderr,
+			Stdin:   os.Stdin,
+			Default: opts.Default,
 			Flutter: opts.Flutter,
 			Gocli:   opts.Gocli,
 		})

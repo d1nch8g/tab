@@ -29,16 +29,3 @@ func call(cmd *exec.Cmd) error {
 	}
 	return nil
 }
-
-func callOut(name string, arg ...string) (string, error) {
-	var buf bytes.Buffer
-	cmd := exec.Command(name, arg...)
-	cmd.Stdout = &buf
-	cmd.Stderr = &buf
-	err := cmd.Run()
-	if err != nil {
-		out := strings.ReplaceAll(buf.String(), "error: ", "")
-		return ``, errors.New(strings.TrimSuffix(out, "\n"))
-	}
-	return strings.TrimSuffix(buf.String(), "\n"), nil
-}

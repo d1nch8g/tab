@@ -21,7 +21,8 @@ operations:
 	pack {-R --remove} [options] [(registry)/(owner)/package(s)]
 	pack {-B --build}  [options] [git/repository(s)]
 	pack {-Q --query}  [options] [package(s)]
-	pack {-A --assist} [options] [args]
+	pack {-G --gpg}    [options] [args]
+	pack {-T --tmpl}   [options] [args]
 
 use 'pack {-h --help}' with an operation for available options`
 
@@ -100,7 +101,7 @@ var Version = `             Pack - package manager.
    the terms of the GNU General Public License.
        Web page: https://fmnx.su/core/pack
  
-                 Version: 0.1.6`
+                 Version: 0.1.7`
 
 func init() {
 	b, err := os.ReadFile("/etc/pacman.conf")

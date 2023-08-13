@@ -1,7 +1,7 @@
 # Maintainer: Danila Fominykh <dancheg97@fmnx.su>
 
 pkgname=pack
-pkgver='0.1.6'
+pkgver='0.1.7'
 pkgrel=1
 pkgdesc="Decentralized package manager based on pacman."
 arch=('x86_64')
@@ -18,8 +18,7 @@ optdepends=(
 makedepends=('go')
 
 build() {
-  cd ..
-  go build -o src/p .
+  go build -o p ../.
 }
 
 package() {
