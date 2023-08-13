@@ -70,19 +70,28 @@ options:
 	-d, --dir <dir> Use custom dir to store result (default /var/cache/pacman/pkg)
 	-s, --syncbuild Syncronize dependencies and build target
 	-r, --rmdeps    Remove installed dependencies after a successful build
-	-g, --garbage   Do not clean workspace before and after build
+	-g, --dirty     Do not clean workspace before and after build
 
 usage:  pack {-B --build} [options] <git/repository(s)>`
 
-var AssistHelp = `Additional utilities
+var GpgHelp = `GPG operations
 
 options:
-	-e, --export  Export public GnuPG key armor
-	-x, --fix     Check/fix compatability of identities in git, gpg and makepkg.
-	    --flutter Generate PKGBUILD, app.sh and app.desktop for flutter application
-	    --gocli   Generate PKGBUILD for CLI utility in go
+	-e, --export  Export public GPG key armor
+	-g, --git     Set gpg key id as git signing key (provide as arguement)
+	-p, --privid  List secret keys with their IDs
+	-p, --pubring List public keys with their IDs
 
-usage:  pack {-A --assist} [options] <(args)>`
+usage:  pack {-G --gpg} [options] <(args)>`
+
+var TmplHelp = `Template operations
+
+options:
+	-t, --default Default PKGBUILD template /usr/share/pacman/PKGBUILD.proto
+	    --flutter Templtate for flutter project 
+	    --gocli   Templtate for CLI tool in go
+
+usage:  pack {-G --gpg} [options] <(args)>`
 
 var Version = `             Pack - package manager.
           Copyright (C) 2023 FMNX team

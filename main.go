@@ -26,7 +26,8 @@ var opts struct {
 	Sync   bool `short:"S" long:"sync"`
 	Push   bool `short:"P" long:"push"`
 	Build  bool `short:"B" long:"build"`
-	Assist bool `short:"A" long:"assist"`
+	Gpg    bool `short:"G" long:"gpg"`
+	Tmpl   bool `short:"T" long:"templates"`
 
 	// Sync options.
 	Quick   bool   `short:"q" long:"quick"`
@@ -53,11 +54,16 @@ var opts struct {
 	// Build options.
 	Syncbuild bool `short:"s" long:"syncbuild"`
 	Rmdeps    bool `short:"r" long:"rmdeps"`
-	Garbage   bool `short:"g" long:"garbage"`
+	Dirty     bool `short:"g" long:"dirty"`
 
-	// Assist options.
+	// Gpg options.
 	Export  bool `short:"e" long:"export"`
-	Fix     bool `short:"x" long:"fix"`
+	Private bool `short:"p" long:"privid"`
+	Gitkey  bool `short:"x" long:"gitid"`
+	Pubring bool `short:"p" long:"pubring"`
+
+	// Templates options.
+	Default bool `short:"t" long:"default"`
 	Flutter bool `long:"flutter"`
 	Gocli   bool `long:"gocli"`
 }
@@ -149,14 +155,29 @@ func run() error {
 			Quick:     opts.Quick,
 			Syncbuild: opts.Syncbuild,
 			Rmdeps:    opts.Rmdeps,
-			Garbage:   opts.Garbage,
+			Garbage:   opts.Dirty,
 			Stdout:    os.Stdout,
 			Stderr:    os.Stderr,
 			Stdin:     os.Stdin,
 		})
 
+	case opts.Gpg && opts.Help:
+		fmt.Println(msgs.GpgHelp)
+		return nil
+
+	case opts.Gpg:
+		return pack.Gpg(args(), pack.GpgParameters{
+			Stdout:  nil,
+			Stderr:  nil,
+			Stdin:   nil,
+			Export:  opts.Export,
+			Git:     opts.Gitkey,
+			Privid:  opts.Private,
+			Pubring: opts.Pubring,
+		})
+
 	case opts.Assist && opts.Help:
-		fmt.Println(msgs.AssistHelp)
+		fmt.Println(msgs.GpgHelp)
 		return nil
 
 	case opts.Assist:
