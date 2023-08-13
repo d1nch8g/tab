@@ -13,9 +13,7 @@
 
 > **Warning!** The project is in early alpha so APIs might be changed.
 
-Pack works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management.
-
-For users, pack provides the ability to install packages from any compatible registry using package URL. For developers, pack the offers a simple interface for quick package delivery.
+Pack works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management. Main goal of pack is to simplify process of arch package creation, 
 
 ---
 
