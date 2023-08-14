@@ -11,9 +11,9 @@
 [![](https://img.shields.io/badge/github-repo-white.svg)](https://github.com/fmnx-su/pack)
 [![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://fmnx.su/core/-/packages/arch/pack)
 
-> **Warning!** The project is in early alpha so APIs might be changed.
+> **Warning!** The project is in early alpha, API will propably be changed.
 
-Pack works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management. Main goal of pack is to simplify process of arch package creation, 
+Pack works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management. Main goal of pack is to simplify process of arch package creation,
 
 ---
 
@@ -88,13 +88,23 @@ pack -P fmnx.su/core/onlyoffice-bin
 - `-d`, `--dir` _directory_ - Use custom source directory with packages (default pacman cache)
 - `--distro` - Assign custom distribution in registry (default archlinux)
 
-6. Assist - generate project templates, export [GnuPG](https://gnupg.org/) keys, set packages, etc...
+6. GPG - different [GnuPG](https://gnupg.org/) related operations (check, export keys, etc...)
 
 ```sh
-pack -A
+pack -Gh
 ```
 
-- `-e`, `--export` - Export public GnuPG key armor
-- `-x`, `--fix` - Check/fix compatibility of identities in git, gpg and makepkg.
-- `--flutter` - Generate PKGBUILD, app.sh and app.desktop for flutter application
-- `--gocli` - Generate PKGBUILD for CLI utility in go
+- `-e`, `--export` - Export public GPG key armor
+- `-g`, `--git` - Set gpg key id as git signing key (provide as arguement)
+- `-p`, `--privid` - List secret keys with their IDs
+- `-p`, `--pubring` - List public keys with their IDs
+
+7. Templates - generate [PKGBUILD](https://wiki.archlinux.org/title/PKGBUILD) templates/other project related files.
+
+```sh
+pack -Th
+```
+
+- `-t`, `--default` - Default PKGBUILD template /usr/share/pacman/PKGBUILD.proto
+- `--flutter` - Templtate for flutter project
+- `--gocli` - Templtate for CLI tool in go
