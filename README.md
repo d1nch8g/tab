@@ -69,7 +69,8 @@ pack -R for example.com/owner/package@1-1
 4. Build packages - command that you use to build packages. If you provide git repo(s) in arguments, this command will clone and build them.
 
 ```sh
-pack -B aur.archlinux.org/veloren-bin aur.archlinux.org/onlyoffice-bin
+pack -B aur.archlinux.org/veloren-bin fmnx.su/core/ainst
+pack -Bqsa onlyoffice-bin
 ```
 
 After a successful build, prepared packages are stored in `/var/cache/pacman/pkg`. Delete flags:
@@ -79,6 +80,7 @@ After a successful build, prepared packages are stored in `/var/cache/pacman/pkg
 - `-s`, `--syncbuild` - Syncronize dependencies and build target
 - `-r`, `--rmdeps` - Remove installed dependencies after a successful build
 - `-g`, `--dirty` - Do not clean workspace before and after build
+- `-a`, `--aur` - Build targets from AUR git repositories (aur.archlinux.org)
 
 5. Push packages - operation that you use to deliver your software to any pack registry (currently standalone registry or gitea).
 
