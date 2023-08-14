@@ -8,44 +8,40 @@ package pack
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
 	"fmnx.su/core/pack/pacman"
-	"fmnx.su/core/pack/sudo"
+	"fmnx.su/core/pack/process"
 )
 
 type SyncParameters struct {
-	Stdout io.Writer
-	Stderr io.Writer
-	Stdin  io.Reader
-
 	// Download fresh package databases from the server (-yy force)
-	Refresh []bool
+	Refresh []bool `short:"y" long:"refresh"`
 	// Upgrade installed packages (-uu enables downgrade)
-	Upgrade []bool
+	Upgrade []bool `short:"u" long:"upgrade"`
 	// Don't ask for any confirmation (--noconfirm)
-	Quick bool
+	Quick bool `short:"q" long:"quick"`
 	// Reinstall up to date targets
-	Force bool
+	Force bool `short:"f" long:"force"`
 	// Use HTTP instead of https
-	Insecure bool
+	Insecure bool `short:"i" long:"insecure"`
 }
 
-func syncdefault() *SyncParameters {
-	return &SyncParameters{
-		Quick:   true,
-		Refresh: []bool{true},
-		Stdout:  os.Stdout,
-		Stderr:  os.Stderr,
-		Stdin:   os.Stdin,
-	}
-}
+var SyncHelp = `Syncronize packages
+
+options:
+	-q, --quick    Do not ask for any confirmation (noconfirm shortcut)
+	-y, --refresh  Download fresh package databases from the server (-yy force)
+	-u, --upgrade  Upgrade installed packages (-uu enables downgrade)
+	-f, --force    Reinstall up to date targets
+	-i, --insecure Use HTTP protocol for new pacman databases (HTTPS by default)
+
+usage:  pack {-S --sync} [options] <(registry)/(owner)/package(s)>`
 
 // Syncronize provided packages with provided parameters.
 func Sync(args []string, prms ...SyncParameters) error {
-	p := formOptions(prms, syncdefault)
+	p := getOptions(prms)
 
 	var err error
 	var conf *string
@@ -58,9 +54,9 @@ func Sync(args []string, prms ...SyncParameters) error {
 			NoConfirm: p.Quick,
 			Refresh:   p.Refresh,
 			Upgrade:   p.Upgrade,
-			Stdout:    p.Stdout,
-			Stderr:    p.Stderr,
-			Stdin:     p.Stdin,
+			Stdout:    os.Stdout,
+			Stderr:    os.Stderr,
+			Stdin:     os.Stdin,
 		})
 	}
 
@@ -77,9 +73,9 @@ func Sync(args []string, prms ...SyncParameters) error {
 		NoConfirm: p.Quick,
 		Refresh:   p.Refresh,
 		Upgrade:   p.Upgrade,
-		Stdout:    p.Stdout,
-		Stderr:    p.Stderr,
-		Stdin:     p.Stdin,
+		Stdout:    os.Stdout,
+		Stderr:    os.Stderr,
+		Stdin:     os.Stdin,
 	})
 	if err != nil {
 		return errors.Join(err, writeconf(*conf))
@@ -123,7 +119,11 @@ func addConfDatabase(protocol, database, domain, owner string) error {
 	os := "archlinux"
 	tmpl := fmt.Sprintf(confroot, database, protocol, domain, owner, os, "x86_64")
 	command := "cat <<EOF >> /etc/pacman.conf" + tmpl + "EOF"
-	return call(sudo.Command(true, "bash", "-c", command))
+	return call(process.Command(&process.Params{
+		Sudo:    true,
+		Command: "bash",
+		Args:    []string{"-c", command},
+	}))
 }
 
 // Format packages to pre-sync format.
@@ -145,8 +145,9 @@ func formatPackages(pkgs []string) []string {
 
 // Overwrite pacman.conf with provided string.
 func writeconf(s string) error {
-	return call(sudo.Command(
-		true, "bash", "-c",
-		"cat <<EOF > /etc/pacman.conf\n"+s+"EOF",
-	))
+	return call(process.Command(&process.Params{
+		Sudo:    true,
+		Command: "bash",
+		Args:    []string{"-c", "cat <<EOF > /etc/pacman.conf\n" + s + "EOF"},
+	}))
 }

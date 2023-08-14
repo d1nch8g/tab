@@ -8,7 +8,6 @@ package pack
 import (
 	"errors"
 	"fmt"
-	"io"
 	"os"
 	"strings"
 
@@ -17,28 +16,25 @@ import (
 
 // Parameters to generate PKGBUILD templates.
 type TmplParameters struct {
-	Stdout io.Writer
-	Stderr io.Writer
-	Stdin  io.Reader
-
 	// Generate default PKGBUILD tempalte
-	Default bool
+	Default bool `short:"t" long:"default"`
 	// Templtate for flutter project
-	Flutter bool
+	Flutter bool `short:"f" long:"flutter"`
 	// Templtate for CLI tool in go
-	Gocli bool
+	Gocli bool `short:"g" long:"gocli"`
 }
 
-func utildefault() *TmplParameters {
-	return &TmplParameters{
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-		Stdin:  os.Stdin,
-	}
-}
+var TmplHelp = `Template operations
+
+options:
+	-t, --default Default PKGBUILD template /usr/share/pacman/PKGBUILD.proto
+	-f, --flutter Templtate for flutter project 
+	-g, --gocli   Templtate for CLI tool in go
+
+usage:  pack {-G --gpg} [options] <(args)>`
 
 func Tmpl(args []string, prms ...TmplParameters) error {
-	p := formOptions(prms, utildefault)
+	p := getOptions(prms)
 
 	switch {
 	case p.Default:
@@ -58,7 +54,7 @@ func GenWrap(p *TmplParameters, f func() error) error {
 	if err != nil {
 		return err
 	}
-	msgs.Amsg(p.Stdout, "Template generated")
+	msgs.Amsg(os.Stdout, "Template generated")
 	return nil
 }
 

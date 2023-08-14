@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"fmnx.su/core/pack/sudo"
+	"fmnx.su/core/pack/process"
 )
 
 // Optional parameters for pacman remove command.
@@ -52,33 +52,36 @@ func Remove(pkgs string, opts ...RemoveParameters) error {
 
 // Remove packages from system.
 func RemoveList(pkgs []string, opts ...RemoveParameters) error {
-	o := formOptions(opts, RemoveDefault)
+	p := formOptions(opts, RemoveDefault)
 
 	var args = []string{"-R"}
-	if o.NoConfirm {
+	if p.NoConfirm {
 		args = append(args, "--noconfirm")
 	}
-	if o.Recursive {
+	if p.Recursive {
 		args = append(args, "--recursive")
 	}
-	if o.ForceRecursive {
+	if p.ForceRecursive {
 		args = append(args, "-ss")
 	}
-	if o.Cascade {
+	if p.Cascade {
 		args = append(args, "--cascade")
 	}
-	if o.WithConfigs {
+	if p.WithConfigs {
 		args = append(args, "--nosave")
 	}
-	args = append(args, o.AdditionalParams...)
+	args = append(args, p.AdditionalParams...)
 	args = append(args, pkgs...)
-
-	cmd := sudo.Command(o.Sudo, pacman, args...)
-	cmd.Stdout = o.Stdout
-	cmd.Stderr = o.Stderr
-	cmd.Stdin = o.Stdin
 
 	mu.Lock()
 	defer mu.Unlock()
-	return cmd.Run()
+
+	return process.Command(&process.Params{
+		Stdout:  p.Stdout,
+		Stderr:  p.Stderr,
+		Stdin:   p.Stdin,
+		Sudo:    p.Sudo,
+		Command: pacman,
+		Args:    args,
+	}).Run()
 }

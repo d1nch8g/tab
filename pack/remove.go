@@ -20,32 +20,31 @@ import (
 )
 
 type RemoveParameters struct {
-	Stdout io.Writer
-	Stderr io.Writer
-	Stdin  io.Reader
-
 	// Ask for confirmation when deleting package.
-	Confirm bool
+	Confirm bool `short:"c" long:"confirm"`
 	// Leave package dependencies in the system (removed by default).
-	Norecursive bool
+	Norecursive bool `short:"r" long:"norecurs"`
 	// Leave package configs in the system (removed by default).
-	Nocfgs bool
+	Nocfgs bool `short:"f" long:"nocfgs"`
 	// Remove packages and all packages that depend on them.
-	Cascade bool
+	Cascade bool `short:"c" long:"cascade"`
 	// Use insecure connection for remote deletions.
-	Insecure bool
+	Insecure bool `short:"i" long:"insecure"`
 }
 
-func removeDefault() *RemoveParameters {
-	return &RemoveParameters{
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-		Stdin:  os.Stdin,
-	}
-}
+var RemoveHelp = `Remove packages
+
+options:
+	-c, --confirm  Ask for confirmation when deleting package
+	-r, --norecurs Leave package dependencies in the system (removed by default)
+	-f, --nocfgs   Leave package configs in the system (removed by default)
+	-c, --cascade  Remove packages and all packages that depend on them
+	-i, --insecure Use HTTP protocol for API calls (remote delete)
+
+usage:  pack {-R --remove} [options] <(registry)/(owner)/package(s)>`
 
 func Remove(args []string, prms ...RemoveParameters) error {
-	p := formOptions(prms, removeDefault)
+	p := getOptions(prms)
 
 	local, remote := splitRemoved(args)
 
@@ -56,9 +55,9 @@ func Remove(args []string, prms ...RemoveParameters) error {
 			Recursive:   !p.Norecursive,
 			WithConfigs: !p.Nocfgs,
 			Cascade:     p.Cascade,
-			Stdout:      p.Stdout,
-			Stderr:      p.Stderr,
-			Stdin:       p.Stdin,
+			Stdout:      os.Stdout,
+			Stderr:      os.Stderr,
+			Stdin:       os.Stdin,
 		})
 		if err != nil {
 			return err
@@ -66,9 +65,9 @@ func Remove(args []string, prms ...RemoveParameters) error {
 	}
 
 	if len(remote) > 0 {
-		msgs.Amsg(p.Stdout, "Removing remote packages")
+		msgs.Amsg(os.Stdout, "Removing remote packages")
 		for i, pkg := range remote {
-			msgs.Smsg(p.Stdout, "Removing "+pkg, i+1, len(remote))
+			msgs.Smsg(os.Stdout, "Removing "+pkg, i+1, len(remote))
 			err := rmRemote(p, pkg)
 			if err != nil {
 				return err
@@ -138,7 +137,7 @@ func rmRemote(p *RemoveParameters, pkg string) error {
 
 	login, pass, err := creds.Get(protocol, remote)
 	if err != nil {
-		login, pass, err = creds.Create(protocol, remote, p.Stdin, p.Stdout)
+		login, pass, err = creds.Create(protocol, remote, os.Stdin, os.Stdout)
 		if err != nil {
 			return err
 		}

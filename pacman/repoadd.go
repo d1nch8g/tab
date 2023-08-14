@@ -10,7 +10,7 @@ import (
 	"os"
 	"sync"
 
-	"fmnx.su/core/pack/sudo"
+	"fmnx.su/core/pack/process"
 )
 
 // Parameters for adding packages to pacman repo.
@@ -60,40 +60,43 @@ func RepoAdd(dbfile, pkgfile string, opts ...RepoAddParameters) error {
 	dbmu.Lock()
 	defer dbmu.Unlock()
 
-	o := formOptions(opts, RepoAddDefaultOptions)
+	p := formOptions(opts, RepoAddDefaultOptions)
 
 	var args []string
-	if o.New {
+	if p.New {
 		args = append(args, "--new")
 	}
-	if o.Remove {
+	if p.Remove {
 		args = append(args, "--remove")
 	}
-	if o.PreventDowngrade {
+	if p.PreventDowngrade {
 		args = append(args, "--prevent-downgrade")
 	}
-	if o.NoColor {
+	if p.NoColor {
 		args = append(args, "--nocolor")
 	}
-	if o.Sign {
+	if p.Sign {
 		args = append(args, "--sign")
 	}
-	if o.Verify {
+	if p.Verify {
 		args = append(args, "--verify")
 	}
-	if o.Key != "" {
+	if p.Key != "" {
 		args = append(args, "--key")
-		args = append(args, o.Key)
+		args = append(args, p.Key)
 	}
-	args = append(args, o.AdditionalParams...)
+
+	args = append(args, p.AdditionalParams...)
 	args = append(args, dbfile)
 	args = append(args, pkgfile)
 
-	cmd := sudo.Command(o.Sudo, repoadd, args...)
-	cmd.Dir = o.Dir
-	cmd.Stderr = o.Stderr
-	cmd.Stdout = o.Stdout
-	cmd.Stdin = o.Stdin
-
-	return cmd.Run()
+	return process.Command(&process.Params{
+		Stdout:  p.Stderr,
+		Stderr:  p.Stdout,
+		Stdin:   p.Stdin,
+		Dir:     p.Dir,
+		Sudo:    p.Sudo,
+		Command: repoadd,
+		Args:    args,
+	}).Run()
 }
