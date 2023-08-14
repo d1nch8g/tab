@@ -37,10 +37,11 @@ pack -Sy nano blender for example.com/owner/package
 
 You can mix packages with and without registries in input. This command will add missing registries to `pacman.conf` and try to synchronize packages with pacman. Flags for operation:
 
-- `-q`, `--quick` - Do not ask for any confirmation (non-confirm shortcut)
+- `-q`, `--quick` - Do not ask for any confirmation (noconfirm shortcut)
 - `-y`, `--refresh` - Download fresh package databases from the server (-yy force)
 - `-u`, `--upgrade` - Upgrade installed packages (-uu enables downgrade)
-- `-f`, `--force` - Reinstall up-to-date targets
+- `-f`, `--force` - Reinstall up to date targets
+- `-i`, `--insecure` - Use HTTP protocol for new pacman databases (HTTPS by default)
 
 2. Query packages - operation that you use to inspect the state of your system or view package parameters.
 
@@ -59,10 +60,11 @@ pack -R vim
 pack -R for example.com/owner/package@1-1
 ```
 
-- `-o`, `--confirm` - Ask for confirmation when deleting a package
-- `-a`, `--norecurs` - Leave package dependencies in the system (removed by default)
-- `-w`, `--nocfgs` - Leave package configs in the system (removed by default)
-- `-k`, `--cascade` - Remove packages and all packages that depend on them
+- `-c`, `--confirm` - Ask for confirmation when deleting package
+- `-r`, `--norecurs` - Leave package dependencies in the system (removed by default)
+- `-f`, `--nocfgs` - Leave package configs in the system (removed by default)
+- `-c`, `--cascade` - Remove packages and all packages that depend on them
+- `-i`, `--insecure` - Use HTTP protocol for API calls (remote delete)
 
 4. Build packages - command that you use to build packages. If you provide git repo(s) in arguments, this command will clone and build them.
 
@@ -72,11 +74,11 @@ pack -B aur.archlinux.org/veloren-bin aur.archlinux.org/onlyoffice-bin
 
 After a successful build, prepared packages are stored in `/var/cache/pacman/pkg`. Delete flags:
 
-- `-q`, `--quick` - Do not ask for any confirmation (confirm)
-- `-d`, `--dir` _directory_ - Use custom directory to cache built package (default /var/cache/pacman/pkg)
-- `-s`, `--syncbuild` - Synchronize dependencies and build target
+- `-q`, `--quick` - Do not ask for any confirmation (noconfirm)
+- `-d`, `--dir` <dir> - Use custom dir to store result (default /var/cache/pacman/pkg)
+- `-s`, `--syncbuild` - Syncronize dependencies and build target
 - `-r`, `--rmdeps` - Remove installed dependencies after a successful build
-- `-g`, `--garbage` - Do not clean the workspace before and after building
+- `-g`, `--dirty` - Do not clean workspace before and after build
 
 5. Push packages - operation that you use to deliver your software to any pack registry (currently standalone registry or gitea).
 
@@ -84,9 +86,9 @@ After a successful build, prepared packages are stored in `/var/cache/pacman/pkg
 pack -P fmnx.su/core/onlyoffice-bin
 ```
 
-- `-w`, `--insecure` - Push package over HTTP instead of HTTPS
-- `-d`, `--dir` _directory_ - Use custom source directory with packages (default pacman cache)
-- `--distro` - Assign custom distribution in registry (default archlinux)
+- `-d`, `--dir` <dir> - Use custom source dir with packages (default pacman cache)
+- `-i`, `--insecure` - Push package over HTTP instead of HTTPS
+- `-s`, `--distro` - Assign custom distribution in registry (default archlinux)
 
 6. GPG - different [GnuPG](https://gnupg.org/) related operations (check, export keys, etc...)
 
@@ -97,7 +99,7 @@ pack -Gh
 - `-e`, `--export` - Export public GPG key armor
 - `-g`, `--git` - Set gpg key id as git signing key (provide as arguement)
 - `-p`, `--privid` - List secret keys with their IDs
-- `-p`, `--pubring` - List public keys with their IDs
+- `-r`, `--pubring` - List public keys with their IDs
 
 7. Templates - generate [PKGBUILD](https://wiki.archlinux.org/title/PKGBUILD) templates/other project related files.
 
@@ -106,5 +108,5 @@ pack -Th
 ```
 
 - `-t`, `--default` - Default PKGBUILD template /usr/share/pacman/PKGBUILD.proto
-- `--flutter` - Templtate for flutter project
-- `--gocli` - Templtate for CLI tool in go
+- `-f`, `--flutter` - Templtate for flutter project
+- `-g`, `--gocli` - Templtate for CLI tool in go
