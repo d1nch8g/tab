@@ -11,6 +11,8 @@ import (
 	"io"
 	"os/exec"
 	"strings"
+
+	"fmnx.su/core/pack/process"
 )
 
 // Query parameters for pacman packages.
@@ -97,12 +99,13 @@ func Query(pkgs []string, opts ...QueryParameters) error {
 	args = append(args, o.AdditionalParams...)
 	args = append(args, pkgs...)
 
-	cmd := exec.Command(pacman, args...)
-	cmd.Stdout = o.Stdout
-	cmd.Stderr = o.Stderr
-	cmd.Stdin = o.Stdin
-
-	return cmd.Run()
+	return process.Command(&process.Params{
+		Stdout:  o.Stdout,
+		Stderr:  o.Stderr,
+		Stdin:   o.Stdin,
+		Command: pacman,
+		Args:    args,
+	}).Run()
 }
 
 type PackageInfoFull struct {

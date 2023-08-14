@@ -8,7 +8,8 @@ package pacman
 import (
 	"io"
 	"os"
-	"os/exec"
+
+	"fmnx.su/core/pack/process"
 )
 
 // Options for building packages.
@@ -100,114 +101,115 @@ func makepkgdefault() *MakepkgParameters {
 // Function is safe for concurrent usage. Can be called from multiple
 // goruotines, when options Install or SyncDeps are false.
 func Makepkg(opts ...MakepkgParameters) error {
-	o := formOptions(opts, makepkgdefault)
+	p := formOptions(opts, makepkgdefault)
 
 	var args []string
-	if o.IgnoreEach {
+	if p.IgnoreEach {
 		args = append(args, "--ignorearch")
 	}
-	if o.Clean {
+	if p.Clean {
 		args = append(args, "--clean")
 	}
-	if o.CleanBuild {
+	if p.CleanBuild {
 		args = append(args, "--cleanbuild")
 	}
-	if o.NoDeps {
+	if p.NoDeps {
 		args = append(args, "--nodeps")
 	}
-	if o.NoExtract {
+	if p.NoExtract {
 		args = append(args, "--noextract")
 	}
-	if o.Force {
+	if p.Force {
 		args = append(args, "--force")
 	}
-	if o.Geinteg {
+	if p.Geinteg {
 		args = append(args, "--geninteg")
 	}
-	if o.Log {
+	if p.Log {
 		args = append(args, "--log")
 	}
-	if o.NoColor {
+	if p.NoColor {
 		args = append(args, "--nocolor")
 	}
-	if o.NpBuild {
+	if p.NpBuild {
 		args = append(args, "--nobuild")
 	}
-	if o.RmDeps {
+	if p.RmDeps {
 		args = append(args, "--rmdeps")
 	}
-	if o.Repackage {
+	if p.Repackage {
 		args = append(args, "--repackage")
 	}
-	if o.HoldVer {
+	if p.HoldVer {
 		args = append(args, "--holdver")
 	}
-	if o.NoArchive {
+	if p.NoArchive {
 		args = append(args, "--noarchive")
 	}
-	if o.NoCheck {
+	if p.NoCheck {
 		args = append(args, "--nocheck")
 	}
-	if o.NoPrepare {
+	if p.NoPrepare {
 		args = append(args, "--noprepare")
 	}
-	if o.NoSign {
+	if p.NoSign {
 		args = append(args, "--nosign")
 	}
-	if o.Sign {
+	if p.Sign {
 		args = append(args, "--sign")
 	}
-	if o.SkipCheckSums {
+	if p.SkipCheckSums {
 		args = append(args, "--skipchecksums")
 	}
-	if o.SkipIntegrityChecks {
+	if p.SkipIntegrityChecks {
 		args = append(args, "--skipinteg")
 	}
-	if o.SkipPgpCheck {
+	if p.SkipPgpCheck {
 		args = append(args, "--skippgpcheck")
 	}
-	if o.Needed {
+	if p.Needed {
 		args = append(args, "--needed")
 	}
-	if o.NoConfirm {
+	if p.NoConfirm {
 		args = append(args, "--noconfirm")
 	}
-	if o.NoProgressBar {
+	if p.NoProgressBar {
 		args = append(args, "--noprogressbar")
 	}
-	if o.AsDeps {
+	if p.AsDeps {
 		args = append(args, "--asdeps")
 	}
-	if o.File != `` {
+	if p.File != `` {
 		args = append(args, "-p")
-		args = append(args, o.File)
+		args = append(args, p.File)
 	}
-	if o.Config != "" {
+	if p.Config != "" {
 		args = append(args, "--config")
-		args = append(args, o.Config)
+		args = append(args, p.Config)
 	}
-	if o.GpgKey != "" {
+	if p.GpgKey != "" {
 		args = append(args, "--key")
-		args = append(args, o.GpgKey)
+		args = append(args, p.GpgKey)
 	}
-	if o.Install {
+	if p.Install {
 		args = append(args, "--install")
 		mu.Lock()
 		defer mu.Unlock()
 	}
-	if o.SyncDeps {
+	if p.SyncDeps {
 		args = append(args, "--syncdeps")
 		if mu.TryLock() {
 			defer mu.Unlock()
 		}
 	}
-	args = append(args, o.AdditionalParams...)
+	args = append(args, p.AdditionalParams...)
 
-	cmd := exec.Command(makepkg, args...)
-	cmd.Dir = o.Dir
-	cmd.Stdin = o.Stdin
-	cmd.Stdout = o.Stdout
-	cmd.Stderr = o.Stderr
-
-	return cmd.Run()
+	return process.Command(&process.Params{
+		Stdout:  p.Stdout,
+		Stderr:  p.Stderr,
+		Stdin:   p.Stdin,
+		Command: makepkg,
+		Args:    args,
+		Dir:     p.Dir,
+	}).Run()
 }

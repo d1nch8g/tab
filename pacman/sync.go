@@ -12,7 +12,7 @@ import (
 	"os"
 	"strings"
 
-	"fmnx.su/core/pack/sudo"
+	"fmnx.su/core/pack/process"
 )
 
 // Optional parameters for pacman sync command.
@@ -121,14 +121,17 @@ func SyncList(pkgs []string, opts ...SyncParameters) error {
 	args = append(args, o.AdditionalParams...)
 	args = append(args, pkgs...)
 
-	cmd := sudo.Command(o.Sudo, pacman, args...)
-	cmd.Stdout = o.Stdout
-	cmd.Stderr = o.Stderr
-	cmd.Stdin = o.Stdin
-
 	mu.Lock()
 	defer mu.Unlock()
-	return cmd.Run()
+
+	return process.Command(&process.Params{
+		Stdout:  o.Stdout,
+		Stderr:  o.Stderr,
+		Stdin:   o.Stdin,
+		Sudo:    o.Sudo,
+		Command: pacman,
+		Args:    args,
+	}).Run()
 }
 
 // Options to apply when searching for some package.
@@ -166,23 +169,28 @@ func Search(re string, opts ...SearchOptions) ([]SearchResult, error) {
 	}
 	args = append(args, re)
 
-	var b bytes.Buffer
-	cmd := sudo.Command(o.Sudo, pacman, args...)
-	cmd.Stdout = &b
-	cmd.Stderr = &b
-	cmd.Stdin = os.Stdin
+	var buf bytes.Buffer
+
+	cmd := process.Command(&process.Params{
+		Stdout:  &buf,
+		Stderr:  &buf,
+		Stdin:   os.Stdin,
+		Sudo:    o.Sudo,
+		Command: pacman,
+		Args:    args,
+	})
 
 	mu.Lock()
 	defer mu.Unlock()
 	err := cmd.Run()
 
 	if err != nil {
-		if b.String() == `` {
+		if buf.String() == `` {
 			return nil, nil
 		}
-		return nil, errors.New("unable to search: " + b.String())
+		return nil, errors.New("unable to search: " + buf.String())
 	}
-	return serializeOutput(b.String()), nil
+	return serializeOutput(buf.String()), nil
 }
 
 func serializeOutput(output string) []SearchResult {

@@ -12,7 +12,7 @@ import (
 	"strings"
 
 	"fmnx.su/core/pack/pacman"
-	"fmnx.su/core/pack/sudo"
+	"fmnx.su/core/pack/process"
 )
 
 type SyncParameters struct {
@@ -119,7 +119,11 @@ func addConfDatabase(protocol, database, domain, owner string) error {
 	os := "archlinux"
 	tmpl := fmt.Sprintf(confroot, database, protocol, domain, owner, os, "x86_64")
 	command := "cat <<EOF >> /etc/pacman.conf" + tmpl + "EOF"
-	return call(sudo.Command(true, "bash", "-c", command))
+	return call(process.Command(&process.Params{
+		Sudo:    true,
+		Command: "bash",
+		Args:    []string{"-c", command},
+	}))
 }
 
 // Format packages to pre-sync format.
@@ -141,8 +145,9 @@ func formatPackages(pkgs []string) []string {
 
 // Overwrite pacman.conf with provided string.
 func writeconf(s string) error {
-	return call(sudo.Command(
-		true, "bash", "-c",
-		"cat <<EOF > /etc/pacman.conf\n"+s+"EOF",
-	))
+	return call(process.Command(&process.Params{
+		Sudo:    true,
+		Command: "bash",
+		Args:    []string{"-c", "cat <<EOF > /etc/pacman.conf\n" + s + "EOF"},
+	}))
 }

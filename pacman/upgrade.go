@@ -10,7 +10,7 @@ import (
 	"os"
 	"strings"
 
-	"fmnx.su/core/pack/sudo"
+	"fmnx.su/core/pack/process"
 )
 
 // Options to apply when searching for some package.
@@ -54,36 +54,39 @@ func Upgrade(files string, opts ...UpgradeParameters) error {
 
 // Install packages from files.
 func UpgradeList(files []string, opts ...UpgradeParameters) error {
-	o := formOptions(opts, UpgradeDefault)
+	p := formOptions(opts, UpgradeDefault)
 
 	args := []string{"-U"}
-	if o.Needed {
+	if p.Needed {
 		args = append(args, "--needed")
 	}
-	if o.NoConfirm {
+	if p.NoConfirm {
 		args = append(args, "--noconfirm")
 	}
-	if o.NoProgressBar {
+	if p.NoProgressBar {
 		args = append(args, "--noprogressbar")
 	}
-	if o.NoScriptlet {
+	if p.NoScriptlet {
 		args = append(args, "--noscriptlet")
 	}
-	if o.AsDeps {
+	if p.AsDeps {
 		args = append(args, "--asdeps")
 	}
-	if o.AsExplict {
+	if p.AsExplict {
 		args = append(args, "--asexplict")
 	}
-	args = append(args, o.AdditionalParams...)
+	args = append(args, p.AdditionalParams...)
 	args = append(args, files...)
-
-	cmd := sudo.Command(o.Sudo, pacman, args...)
-	cmd.Stdout = o.Stdout
-	cmd.Stderr = o.Stderr
-	cmd.Stdin = o.Stdin
 
 	mu.Lock()
 	defer mu.Unlock()
-	return cmd.Run()
+
+	return process.Command(&process.Params{
+		Stdout:  p.Stdout,
+		Stderr:  p.Stderr,
+		Stdin:   p.Stdin,
+		Sudo:    p.Sudo,
+		Command: pacman,
+		Args:    args,
+	}).Run()
 }
