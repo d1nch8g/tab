@@ -27,23 +27,26 @@ type PushParameters struct {
 	Stdin  io.Reader
 
 	// Directory to read package files and signatures.
-	Directory string
+	Directory string `short:"d" long:"dir" default:"/var/cache/pacman/pkg"`
 	// Which protocol to use for connection.
-	Insecure bool
+	Insecure bool `short:"i" long:"insecure"`
 	// Custom distribution for which package is built.
-	Distro string
+	Distro string `short:"s" long:"distro" default:"archlinux"`
 }
 
-func pushdefault() *PushParameters {
-	return &PushParameters{
-		Directory: "/var/cache/pacman/pkg",
-		Distro:    "archlinux",
-	}
-}
+var PushHelp = `Push cached packages
+
+options:
+	-d, --dir <dir> Use custom source dir with packages (default pacman cache)
+	-i, --insecure  Push package over HTTP instead of HTTPS
+	-s, --distro    Assign custom distribution in registry (default archlinux)
+	-i, --insecure  Use HTTP protocol for API call
+
+usage:  pack {-P --push} [options] <registry/owner/package(s)>`
 
 // Push your package to registry.
 func Push(args []string, prms ...PushParameters) error {
-	p := formOptions(prms, pushdefault)
+	p := getOptions(prms)
 
 	msgs.Amsg(p.Stdout, "Preparing pushed packages")
 

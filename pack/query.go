@@ -6,7 +6,6 @@
 package pack
 
 import (
-	"io"
 	"os"
 
 	"fmnx.su/core/pack/msgs"
@@ -15,30 +14,31 @@ import (
 
 // Parameters that will be used to execute push command.
 type QueryParameters struct {
-	Stdout io.Writer
-	Stderr io.Writer
-	Stdin  io.Reader
-
 	// List outdated packages.
-	Outdated bool
+	Outdated bool `short:"o" long:"outdated"`
 	// Get information about package.
-	Info []bool
+	Info []bool `short:"i" long:"info"`
 	// List package files.
-	List []bool
+	List []bool `short:"l" long:"list"`
 }
 
-func querydefault() *QueryParameters {
-	return &QueryParameters{}
-}
+var QueryHelp = `Query packages
+
+options:
+	-i, --info     View package information (-ii for backup files)
+	-l, --list     List the files owned by the queried package
+	-o, --outdated List outdated packages
+
+usage:  pack {-Q --query} [options] <(registry)/(owner)/package(s)>`
 
 func Query(args []string, prms ...QueryParameters) error {
-	p := formOptions(prms, querydefault)
+	p := getOptions(prms)
 
 	if p.Outdated {
 		err := pacman.SyncList(nil, pacman.SyncParameters{
-			Stdout:  p.Stdout,
-			Stderr:  p.Stderr,
-			Stdin:   p.Stdin,
+			Stdout:  os.Stdout,
+			Stderr:  os.Stderr,
+			Stdin:   os.Stdin,
 			Sudo:    true,
 			Refresh: []bool{true, true},
 		})
@@ -46,11 +46,11 @@ func Query(args []string, prms ...QueryParameters) error {
 			return err
 		}
 
-		msgs.Amsg(p.Stdout, "Outdated packages")
+		msgs.Amsg(os.Stdout, "Outdated packages")
 		return pacman.Query(nil, pacman.QueryParameters{
-			Stdout:  p.Stdout,
-			Stderr:  p.Stderr,
-			Stdin:   p.Stdin,
+			Stdout:  os.Stdout,
+			Stderr:  os.Stderr,
+			Stdin:   os.Stdin,
 			Upgrade: true,
 		})
 	}

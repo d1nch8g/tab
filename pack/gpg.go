@@ -19,22 +19,28 @@ type GpgParameters struct {
 	Stdin  io.Reader
 
 	// Export public GPG key armor
-	Export bool
+	Export bool `short:"e" long:"export"`
 	// Set gpg key id as git signing key (provide as arguement)
-	Gitkey bool
+	Gitkey bool `short:"g" long:"gitid"`
 	// List secret keys with their IDs
-	Privid bool
+	Privid bool `short:"p" long:"privid"`
 	// List public keys with their IDs
-	Pubring bool
+	Pubring bool `short:"r" long:"pubring"`
 }
 
-func gpgdefault() *GpgParameters {
-	return &GpgParameters{}
-}
+var GpgHelp = `GPG operations
+
+options:
+	-e, --export  Export public GPG key armor
+	-g, --git     Set gpg key id as git signing key (provide as arguement)
+	-p, --privid  List secret keys with their IDs
+	-p, --pubring List public keys with their IDs
+
+usage:  pack {-G --gpg} [options] <(args)>`
 
 // Push your package to registry.
 func Gpg(args []string, prms ...GpgParameters) error {
-	p := formOptions(prms, gpgdefault)
+	p := getOptions(prms)
 
 	switch {
 	case p.Export:

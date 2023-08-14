@@ -8,15 +8,28 @@ package pack
 import (
 	"bytes"
 	"errors"
+	"fmt"
+	"os"
 	"os/exec"
 	"strings"
+
+	"fmnx.su/core/pack/msgs"
+	"github.com/jessevdk/go-flags"
 )
 
-func formOptions[Opts any](arr []Opts, getdefault func() *Opts) *Opts {
-	if len(arr) != 1 {
-		return getdefault()
+func getOptions[Opts any](arr []Opts) *Opts {
+	if len(arr) == 1 {
+		return &arr[0]
 	}
-	return &arr[0]
+
+	var opts Opts
+	_, err := flags.NewParser(&opts, flags.IgnoreUnknown).Parse()
+	if err != nil {
+		fmt.Println(msgs.Err + err.Error())
+		os.Exit(1)
+	}
+
+	return &opts
 }
 
 func call(cmd *exec.Cmd) error {

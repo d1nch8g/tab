@@ -28,45 +28,29 @@ var opts struct {
 	Build  bool `short:"B" long:"build"`
 	Gpg    bool `short:"G" long:"gpg"`
 	Tmpl   bool `short:"T" long:"tmpl"`
-
-	// Sync options.
-	Quick   bool   `short:"q" long:"quick"`
-	Refresh []bool `short:"y" long:"refresh"`
-	Upgrade []bool `short:"u" long:"upgrade"`
-	Force   bool   `short:"f" long:"force"`
-
-	// Push options.
-	Dir      string `short:"d" long:"dir" default:"/var/cache/pacman/pkg"`
-	Insecure bool   `short:"w" long:"insecure"`
-	Distro   string `long:"distro" default:"archlinux"`
-
-	// Remove options.
-	Confirm     bool `short:"c" long:"confirm"`
-	Norecursive bool `short:"a" long:"norecursive"`
-	Nocfgs      bool `short:"j" long:"nocfgs"`
-	Cascade     bool `short:"k" long:"cascade"`
-
-	// Query options.
-	Info     []bool `short:"i" long:"info"`
-	List     []bool `short:"l" long:"list"`
-	Outdated bool   `short:"o" long:"outdated"`
-
-	// Build options.
-	Syncbuild bool `short:"s" long:"syncbuild"`
-	Rmdeps    bool `short:"r" long:"rmdeps"`
-	Dirty     bool `short:"g" long:"dirty"`
-
-	// Gpg options.
-	Export  bool `short:"e" long:"export"`
-	Private bool `short:"p" long:"privid"`
-	Gitkey  bool `short:"x" long:"gitid"`
-	Pubring bool `short:"n" long:"pubring"`
-
-	// Templates options.
-	Default bool `short:"t" long:"default"`
-	Flutter bool `long:"flutter"`
-	Gocli   bool `long:"gocli"`
 }
+
+var help = `Simplified version of pacman
+
+operations:
+	pack {-S --sync}   [options] [(registry)/(owner)/package(s)]
+	pack {-P --push}   [options] [(registry)/(owner)/package(s)]
+	pack {-R --remove} [options] [(registry)/(owner)/package(s)]
+	pack {-B --build}  [options] [git/repository(s)]
+	pack {-Q --query}  [options] [package(s)]
+	pack {-G --gpg}    [options] [args]
+	pack {-T --tmpl}   [options] [args]
+
+use 'pack {-h --help}' with an operation for available options`
+
+var version = `             Pack - package manager.
+          Copyright (C) 2023 FMNX team
+     
+  This program may be freely redistributed under
+   the terms of the GNU General Public License.
+       Web page: https://fmnx.su/core/pack
+ 
+                 Version: 0.1.7`
 
 func main() {
 	err := run()
@@ -79,123 +63,68 @@ func main() {
 }
 
 func run() error {
-	_, err := flags.NewParser(&opts, flags.None).Parse()
+	_, err := flags.NewParser(&opts, flags.IgnoreUnknown).Parse()
 	if err != nil {
 		return err
 	}
+	RemoveCapitalArgs()
 
 	switch {
 	case opts.Sync && opts.Help:
-		fmt.Println(msgs.SyncHelp)
+		fmt.Println(pack.SyncHelp)
 		return nil
 
 	case opts.Sync:
-		return pack.Sync(args(), pack.SyncParameters{
-			Quick:    opts.Quick,
-			Refresh:  opts.Refresh,
-			Upgrade:  opts.Upgrade,
-			Force:    opts.Force,
-			Insecure: opts.Insecure,
-			Stdout:   os.Stdout,
-			Stderr:   os.Stderr,
-			Stdin:    os.Stdin,
-		})
+		return pack.Sync(args())
 
 	case opts.Push && opts.Help:
-		fmt.Println(msgs.PushHelp)
+		fmt.Println(pack.PushHelp)
 		return nil
 
 	case opts.Push:
-		return pack.Push(args(), pack.PushParameters{
-			Stdout:    os.Stdout,
-			Stderr:    os.Stderr,
-			Stdin:     os.Stdin,
-			Directory: opts.Dir,
-			Insecure:  opts.Insecure,
-			Distro:    opts.Distro,
-		})
+		return pack.Push(args())
 
 	case opts.Remove && opts.Help:
-		fmt.Println(msgs.RemoveHelp)
+		fmt.Println(pack.RemoveHelp)
 		return nil
 
 	case opts.Remove:
-		return pack.Remove(args(), pack.RemoveParameters{
-			Stdout:      os.Stdout,
-			Stderr:      os.Stderr,
-			Stdin:       os.Stdin,
-			Confirm:     opts.Confirm,
-			Norecursive: opts.Norecursive,
-			Nocfgs:      opts.Nocfgs,
-			Cascade:     opts.Cascade,
-			Insecure:    opts.Insecure,
-		})
+		return pack.Remove(args())
 
 	case opts.Query && opts.Help:
-		fmt.Println(msgs.QueryHelp)
+		fmt.Println(pack.QueryHelp)
 		return nil
 
 	case opts.Query:
-		return pack.Query(args(), pack.QueryParameters{
-			Stdout:   os.Stdout,
-			Stderr:   os.Stderr,
-			Stdin:    os.Stdin,
-			Outdated: opts.Outdated,
-			Info:     opts.Info,
-			List:     opts.List,
-		})
+		return pack.Query(args())
 
 	case opts.Build && opts.Help:
-		fmt.Println(msgs.BuildHelp)
+		fmt.Println(pack.BuildHelp)
 		return nil
 
 	case opts.Build:
-		return pack.Build(args(), pack.BuildParameters{
-			Dir:       opts.Dir,
-			Quick:     opts.Quick,
-			Syncbuild: opts.Syncbuild,
-			Rmdeps:    opts.Rmdeps,
-			Garbage:   opts.Dirty,
-			Stdout:    os.Stdout,
-			Stderr:    os.Stderr,
-			Stdin:     os.Stdin,
-		})
+		return pack.Build(args())
 
 	case opts.Gpg && opts.Help:
-		fmt.Println(msgs.GpgHelp)
+		fmt.Println(pack.GpgHelp)
 		return nil
 
 	case opts.Gpg:
-		return pack.Gpg(args(), pack.GpgParameters{
-			Stdout:  os.Stdout,
-			Stderr:  os.Stderr,
-			Stdin:   os.Stdin,
-			Export:  opts.Export,
-			Gitkey:  opts.Gitkey,
-			Privid:  opts.Private,
-			Pubring: opts.Pubring,
-		})
+		return pack.Gpg(args())
 
 	case opts.Tmpl && opts.Help:
-		fmt.Println(msgs.TmplHelp)
+		fmt.Println(pack.TmplHelp)
 		return nil
 
 	case opts.Tmpl:
-		return pack.Tmpl(args(), pack.TmplParameters{
-			Stdout:  os.Stdout,
-			Stderr:  os.Stderr,
-			Stdin:   os.Stdin,
-			Default: opts.Default,
-			Flutter: opts.Flutter,
-			Gocli:   opts.Gocli,
-		})
+		return pack.Tmpl(args())
 
 	case opts.Version:
-		fmt.Println(msgs.Version)
+		fmt.Println(version)
 		return nil
 
 	case opts.Help:
-		fmt.Println(msgs.Help)
+		fmt.Println(help)
 		return nil
 
 	default:
@@ -242,4 +171,19 @@ func args() []string {
 	}
 
 	return filtered
+}
+
+// TODO: remove lated when bug with unknown args fixed.
+func RemoveCapitalArgs() {
+	var newargs []string
+	for _, v := range os.Args {
+		if strings.HasPrefix(v, "-") {
+			rootargs := []string{"Q", "R", "S", "P", "B", "G", "T"}
+			for _, letter := range rootargs {
+				v = strings.Replace(v, letter, "", 1)
+			}
+		}
+		newargs = append(newargs, v)
+	}
+	os.Args = newargs
 }

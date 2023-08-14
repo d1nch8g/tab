@@ -22,46 +22,44 @@ import (
 
 // Parameters that can be used to build packages.
 type BuildParameters struct {
-	Stdout io.Writer
-	Stderr io.Writer
-	Stdin  io.Reader
-
 	// Directory where resulting package and signature will be moved.
-	Dir string
+	Dir string `short:"d" long:"dir" default:"/var/cache/pacman/pkg"`
 	// Do not ask for any confirmation on build/installation.
-	Quick bool
+	Quick bool `short:"q" long:"quick"`
 	// Syncronize/reinstall package after build.
-	Syncbuild bool
+	Syncbuild bool `short:"s" long:"syncbuild"`
 	// Remove dependencies after successful build.
-	Rmdeps bool
+	Rmdeps bool `short:"r" long:"rmdeps"`
 	// Do not clean workspace before and after build.
-	Garbage bool
+	Dirty bool `short:"g" long:"dirty"`
+	// Automatically append aur.archlinux.org to AUR packages.
+	// Aur bool `short:"a" long:"aur"`
 }
 
-func builddefault() *BuildParameters {
-	return &BuildParameters{
-		Stdout:    os.Stdout,
-		Stderr:    os.Stderr,
-		Stdin:     os.Stdin,
-		Dir:       "/var/cache/pacman/pkg",
-		Syncbuild: true,
-		Rmdeps:    true,
-	}
-}
+var BuildHelp = `Build package
+
+options:
+	-q, --quick     Do not ask for any confirmation (noconfirm)
+	-d, --dir <dir> Use custom dir to store result (default /var/cache/pacman/pkg)
+	-s, --syncbuild Syncronize dependencies and build target
+	-r, --rmdeps    Remove installed dependencies after a successful build
+	-g, --dirty     Do not clean workspace before and after build
+
+usage:  pack {-B --build} [options] <git/repository(s)>`
 
 // Build package in current directory with provided arguements.
 func Build(args []string, prms ...BuildParameters) error {
-	p := formOptions(prms, builddefault)
+	p := getOptions(prms)
 
-	msgs.Amsg(p.Stdout, "Building packages")
+	msgs.Amsg(os.Stdout, "Building packages")
 
-	msgs.Smsg(p.Stdout, "Running GnuPG check", 1, 2)
+	msgs.Smsg(os.Stdout, "Running GnuPG check", 1, 2)
 	err := CheckGnuPG()
 	if err != nil {
 		return err
 	}
 
-	msgs.Smsg(p.Stdout, "Validating packager identity", 2, 2)
+	msgs.Smsg(os.Stdout, "Validating packager identity", 2, 2)
 	err = ValidatePackager()
 	if err != nil {
 		return err
@@ -80,7 +78,7 @@ func Build(args []string, prms ...BuildParameters) error {
 	}
 
 	for _, arg := range args {
-		dir, err := CloneOrPullDir(p.Stdout, p.Stderr, arg)
+		dir, err := CloneOrPullDir(os.Stdout, os.Stderr, arg)
 		if err != nil {
 			return err
 		}
@@ -88,16 +86,16 @@ func Build(args []string, prms ...BuildParameters) error {
 	}
 
 	for _, dir := range builddirs {
-		msgs.Amsg(p.Stdout, "Building package with makepkg")
+		msgs.Amsg(os.Stdout, "Building package with makepkg")
 		err = pacman.Makepkg(pacman.MakepkgParameters{
 			Sign:       true,
 			Dir:        dir,
-			Stdout:     p.Stdout,
-			Stderr:     p.Stderr,
-			Stdin:      p.Stdin,
-			Clean:      !p.Garbage,
-			CleanBuild: !p.Garbage,
-			Force:      !p.Garbage,
+			Stdout:     os.Stdout,
+			Stderr:     os.Stderr,
+			Stdin:      os.Stdin,
+			Clean:      !p.Dirty,
+			CleanBuild: !p.Dirty,
+			Force:      !p.Dirty,
 			Install:    p.Syncbuild,
 			RmDeps:     p.Rmdeps,
 			SyncDeps:   p.Syncbuild,
@@ -108,7 +106,7 @@ func Build(args []string, prms ...BuildParameters) error {
 			return errors.Join(err)
 		}
 
-		msgs.Amsg(p.Stdout, "Moving package to cache")
+		msgs.Amsg(os.Stdout, "Moving package to cache")
 		err = CachePackage(dir, p.Dir)
 		if err != nil {
 			return err
