@@ -22,10 +22,6 @@ import (
 
 // Parameters that will be used to execute push command.
 type PushParameters struct {
-	Stdout io.Writer
-	Stderr io.Writer
-	Stdin  io.Reader
-
 	// Directory to read package files and signatures.
 	Directory string `short:"d" long:"dir" default:"/var/cache/pacman/pkg"`
 	// Which protocol to use for connection.
@@ -40,7 +36,6 @@ options:
 	-d, --dir <dir> Use custom source dir with packages (default pacman cache)
 	-i, --insecure  Push package over HTTP instead of HTTPS
 	-s, --distro    Assign custom distribution in registry (default archlinux)
-	-i, --insecure  Use HTTP protocol for API call
 
 usage:  pack {-P --push} [options] <registry/owner/package(s)>`
 
@@ -48,21 +43,21 @@ usage:  pack {-P --push} [options] <registry/owner/package(s)>`
 func Push(args []string, prms ...PushParameters) error {
 	p := getOptions(prms)
 
-	msgs.Amsg(p.Stdout, "Preparing pushed packages")
+	msgs.Amsg(os.Stdout, "Preparing pushed packages")
 
 	cachedpkgs, err := listPkgFilenames(p.Directory)
 	if err != nil {
 		return err
 	}
-	msgs.Smsg(p.Stdout, "Scanning cached packages", 2, 3)
+	msgs.Smsg(os.Stdout, "Scanning cached packages", 2, 3)
 
 	mds, err := prepareMetadata(p.Directory, cachedpkgs, args)
 	if err != nil {
 		return err
 	}
-	msgs.Smsg(p.Stdout, "Preparing package metadata", 3, 3)
+	msgs.Smsg(os.Stdout, "Preparing package metadata", 3, 3)
 
-	msgs.Amsg(p.Stdout, "Pushing packages")
+	msgs.Amsg(os.Stdout, "Pushing packages")
 	for i, md := range mds {
 		err = push(*p, md, i+1, len(mds))
 		if err != nil {
@@ -188,7 +183,7 @@ func push(pp PushParameters, m PackageMetadata, i, t int) error {
 					"Pushing %s to %s...", m.FileName,
 					path.Join(m.Addr, m.Owner),
 				),
-				Output: pp.Stdout,
+				Output: os.Stdout,
 			}),
 		},
 	)
@@ -198,7 +193,7 @@ func push(pp PushParameters, m PackageMetadata, i, t int) error {
 
 	login, pass, err := creds.Get(protocol, m.Addr)
 	if err != nil {
-		login, pass, err = creds.Create(protocol, m.Addr, pp.Stdin, pp.Stdout)
+		login, pass, err = creds.Create(protocol, m.Addr, os.Stdin, os.Stdout)
 		if err != nil {
 			return err
 		}
