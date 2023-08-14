@@ -33,7 +33,7 @@ type BuildParameters struct {
 	// Do not clean workspace before and after build.
 	Dirty bool `short:"g" long:"dirty"`
 	// Automatically append aur.archlinux.org to AUR packages.
-	// Aur bool `short:"a" long:"aur"`
+	Aur bool `short:"a" long:"aur"`
 }
 
 var BuildHelp = `Build package
@@ -44,6 +44,7 @@ options:
 	-s, --syncbuild Syncronize dependencies and build target
 	-r, --rmdeps    Remove installed dependencies after a successful build
 	-g, --dirty     Do not clean workspace before and after build
+	-a, --aur       Build targets from AUR git repositories (aur.archlinux.org)
 
 usage:  pack {-B --build} [options] <git/repository(s)>`
 
@@ -75,6 +76,12 @@ func Build(args []string, prms ...BuildParameters) error {
 		}
 		builddirs = append(args, currdir)
 		buildcurrdir = true
+	}
+
+	if p.Aur {
+		for i := range args {
+			args[i] = `aur.archlinux.org/` + args[i]
+		}
 	}
 
 	for _, arg := range args {
