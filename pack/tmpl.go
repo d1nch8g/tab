@@ -19,17 +19,17 @@ type TmplParameters struct {
 	// Generate default PKGBUILD tempalte
 	Default bool `short:"t" long:"default"`
 	// Templtate for flutter project
-	Flutter bool `long:"flutter"`
+	Flutter bool `short:"f" long:"flutter"`
 	// Templtate for CLI tool in go
-	Gocli bool `long:"gocli"`
+	Gocli bool `short:"g" long:"gocli"`
 }
 
 var TmplHelp = `Template operations
 
 options:
 	-t, --default Default PKGBUILD template /usr/share/pacman/PKGBUILD.proto
-	    --flutter Templtate for flutter project 
-	    --gocli   Templtate for CLI tool in go
+	-f, --flutter Templtate for flutter project 
+	-g, --gocli   Templtate for CLI tool in go
 
 usage:  pack {-G --gpg} [options] <(args)>`
 

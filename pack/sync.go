@@ -31,18 +31,17 @@ type SyncParameters struct {
 var SyncHelp = `Syncronize packages
 
 options:
-	-q, --quick       Do not ask for any confirmation (noconfirm shortcut)
-	-y, --refresh     Download fresh package databases from the server (-yy force)
-	-u, --upgrade     Upgrade installed packages (-uu enables downgrade)
-	-f, --force       Reinstall up to date targets
-	
+	-q, --quick    Do not ask for any confirmation (noconfirm shortcut)
+	-y, --refresh  Download fresh package databases from the server (-yy force)
+	-u, --upgrade  Upgrade installed packages (-uu enables downgrade)
+	-f, --force    Reinstall up to date targets
+	-i, --insecure Use HTTP protocol for new pacman databases (HTTPS by default)
 
 usage:  pack {-S --sync} [options] <(registry)/(owner)/package(s)>`
 
 // Syncronize provided packages with provided parameters.
 func Sync(args []string, prms ...SyncParameters) error {
 	p := getOptions(prms)
-	
 
 	var err error
 	var conf *string
