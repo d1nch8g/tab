@@ -27,7 +27,7 @@ type RemoveParameters struct {
 	// Leave package configs in the system (removed by default).
 	Nocfgs bool `short:"f" long:"nocfgs"`
 	// Remove packages and all packages that depend on them.
-	Cascade bool `short:"c" long:"cascade"`
+	Cascade bool `short:"s" long:"cascade"`
 	// Use insecure connection for remote deletions.
 	Insecure bool `short:"i" long:"insecure"`
 }
@@ -38,7 +38,7 @@ options:
 	-c, --confirm  Ask for confirmation when deleting package
 	-r, --norecurs Leave package dependencies in the system (removed by default)
 	-f, --nocfgs   Leave package configs in the system (removed by default)
-	-c, --cascade  Remove packages and all packages that depend on them
+	-s, --cascade  Remove packages and all packages that depend on them
 	-i, --insecure Use HTTP protocol for API calls (remote delete)
 
 usage:  pack {-R --remove} [options] <(registry)/(owner)/package(s)>`

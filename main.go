@@ -20,7 +20,6 @@ var opts struct {
 	Help    bool `long:"help" short:"h"`
 	Version bool `long:"version" short:"v"`
 
-	// Root options.
 	Query  bool `short:"Q" long:"query"`
 	Remove bool `short:"R" long:"remove"`
 	Sync   bool `short:"S" long:"sync"`
@@ -173,7 +172,7 @@ func args() []string {
 	return filtered
 }
 
-// TODO: remove lated when bug with unknown args fixed.
+// TODO: remove later when bug with unknown args fixed.
 func RemoveCapitalArgs() {
 	var newargs []string
 	for _, v := range os.Args {
