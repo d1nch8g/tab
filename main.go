@@ -25,8 +25,6 @@ var opts struct {
 	Sync   bool `short:"S" long:"sync"`
 	Push   bool `short:"P" long:"push"`
 	Build  bool `short:"B" long:"build"`
-	Gpg    bool `short:"G" long:"gpg"`
-	Tmpl   bool `short:"T" long:"tmpl"`
 }
 
 var help = `Simplified version of pacman
