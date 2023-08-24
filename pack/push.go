@@ -12,6 +12,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"os/exec"
 	"path"
 	"strings"
 
@@ -28,6 +29,8 @@ type PushParameters struct {
 	Insecure bool `short:"i" long:"insecure"`
 	// Custom distribution for which package is built.
 	Distro string `short:"s" long:"distro" default:"archlinux"`
+	// Export public GPG key armor.
+	Export bool `short:"e" long:"export"`
 }
 
 var PushHelp = `Push cached packages
@@ -36,12 +39,17 @@ options:
 	-d, --dir <dir> Use custom source dir with packages (default pacman cache)
 	-i, --insecure  Push package over HTTP instead of HTTPS
 	-s, --distro    Assign custom distribution in registry (default archlinux)
+	-e, --export    Export public GPG key armor
 
 usage:  pack {-P --push} [options] <registry/owner/package(s)>`
 
 // Push your package to registry.
 func Push(args []string, prms ...PushParameters) error {
 	p := getOptions(prms)
+
+	if p.Export {
+		return Export(p)
+	}
 
 	msgs.Amsg(os.Stdout, "Preparing pushed packages")
 
@@ -65,6 +73,20 @@ func Push(args []string, prms ...PushParameters) error {
 		}
 	}
 	return nil
+}
+
+// Export public GPG key, which can be added to gitea/gitlab/github.
+func Export(p *PushParameters) error {
+	ident, err := GnuPGidentity()
+	if err != nil {
+		return err
+	}
+	gpgemail := strings.Replace(strings.Split(ident, " <")[1], ">", "", 1)
+	cmd := exec.Command("gpg", "--armor", "--export", gpgemail)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Stdin = os.Stdin
+	return cmd.Run()
 }
 
 type PackageMetadata struct {

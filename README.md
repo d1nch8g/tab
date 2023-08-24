@@ -76,7 +76,7 @@ pack -Bqsa onlyoffice-bin
 After a successful build, prepared packages are stored in `/var/cache/pacman/pkg`. Delete flags:
 
 - `-q`, `--quick` - Do not ask for any confirmation (noconfirm)
-- `-d`, `--dir` <dir> - Use custom dir to store result (default /var/cache/pacman/pkg)
+- `-d`, `--dir` - Use custom dir to store result (default /var/cache/pacman/pkg)
 - `-s`, `--syncbuild` - Syncronize dependencies and build target
 - `-r`, `--rmdeps` - Remove installed dependencies after a successful build
 - `-g`, `--dirty` - Do not clean workspace before and after build
@@ -88,27 +88,7 @@ After a successful build, prepared packages are stored in `/var/cache/pacman/pkg
 pack -P fmnx.su/core/onlyoffice-bin
 ```
 
-- `-d`, `--dir` <dir> - Use custom source dir with packages (default pacman cache)
+- `-d`, `--dir` - Use custom source dir with packages (default pacman cache)
 - `-i`, `--insecure` - Push package over HTTP instead of HTTPS
 - `-s`, `--distro` - Assign custom distribution in registry (default archlinux)
-
-6. GPG - different [GnuPG](https://gnupg.org/) related operations (check, export keys, etc...)
-
-```sh
-pack -Gh
-```
-
 - `-e`, `--export` - Export public GPG key armor
-- `-g`, `--git` - Set gpg key id as git signing key (provide as arguement)
-- `-p`, `--privid` - List secret keys with their IDs
-- `-r`, `--pubring` - List public keys with their IDs
-
-7. Templates - generate [PKGBUILD](https://wiki.archlinux.org/title/PKGBUILD) templates/other project related files.
-
-```sh
-pack -Th
-```
-
-- `-t`, `--default` - Default PKGBUILD template /usr/share/pacman/PKGBUILD.proto
-- `-f`, `--flutter` - Templtate for flutter project
-- `-g`, `--gocli` - Templtate for CLI tool in go

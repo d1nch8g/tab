@@ -25,8 +25,6 @@ var opts struct {
 	Sync   bool `short:"S" long:"sync"`
 	Push   bool `short:"P" long:"push"`
 	Build  bool `short:"B" long:"build"`
-	Gpg    bool `short:"G" long:"gpg"`
-	Tmpl   bool `short:"T" long:"tmpl"`
 }
 
 var help = `Simplified version of pacman
@@ -37,8 +35,6 @@ operations:
 	pack {-R --remove} [options] [(registry)/(owner)/package(s)]
 	pack {-B --build}  [options] [git/repository(s)]
 	pack {-Q --query}  [options] [package(s)]
-	pack {-G --gpg}    [options] [args]
-	pack {-T --tmpl}   [options] [args]
 
 use 'pack {-h --help}' with an operation for available options`
 
@@ -49,7 +45,7 @@ var version = `             Pack - package manager.
    the terms of the GNU General Public License.
        Web page: https://fmnx.su/core/pack
  
-                 Version: 0.1.7`
+                 Version: 0.1.8`
 
 func main() {
 	err := run()
@@ -103,20 +99,6 @@ func run() error {
 
 	case opts.Build:
 		return pack.Build(args())
-
-	case opts.Gpg && opts.Help:
-		fmt.Println(pack.GpgHelp)
-		return nil
-
-	case opts.Gpg:
-		return pack.Gpg(args())
-
-	case opts.Tmpl && opts.Help:
-		fmt.Println(pack.TmplHelp)
-		return nil
-
-	case opts.Tmpl:
-		return pack.Tmpl(args())
 
 	case opts.Version:
 		fmt.Println(version)
