@@ -57,13 +57,13 @@ func Push(args []string, prms ...PushParameters) error {
 	if err != nil {
 		return err
 	}
-	msgs.Smsg(os.Stdout, "Scanning cached packages", 2, 3)
+	msgs.Smsg(os.Stdout, "Scanning cached packages", 1, 2)
 
 	mds, err := prepareMetadata(p.Directory, cachedpkgs, args)
 	if err != nil {
 		return err
 	}
-	msgs.Smsg(os.Stdout, "Preparing package metadata", 3, 3)
+	msgs.Smsg(os.Stdout, "Preparing package metadata", 2, 2)
 
 	msgs.Amsg(os.Stdout, "Pushing packages")
 	for i, md := range mds {
