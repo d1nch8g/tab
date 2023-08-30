@@ -7,7 +7,5 @@ push:
 	git push
 	git push github
 	git push codeberg
-	pack -P fmnx.su/core/pack
-
-build:
 	pack -Bqs
+	pack -P fmnx.su/core/pack

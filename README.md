@@ -82,7 +82,7 @@ After a successful build, prepared packages are stored in `/var/cache/pacman/pkg
 - `-g`, `--dirty` - Do not clean workspace before and after build
 - `-a`, `--aur` - Build targets from AUR git repositories (aur.archlinux.org)
 
-5. Push packages - operation that you use to deliver your software to any pack registry (currently standalone registry or gitea).
+5. Push packages - operation that you use to deliver your software to any pack registry (currently only gitea supported).
 
 ```sh
 pack -P fmnx.su/core/onlyoffice-bin
