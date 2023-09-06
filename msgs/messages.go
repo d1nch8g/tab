@@ -61,38 +61,70 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 	}
 
 	var (
-		prefix       = fmt.Sprintf("(%d/%d) %s", p.Current, p.Total, p.Msg)
-		loaderwidth  = int(float64(width) * 0.35)
-		paddingWidth = width - len(prefix) - loaderwidth - 7
+		prefix     = fmt.Sprintf("(%d/%d) %s", p.Current, p.Total, p.Msg)
+		minloader  = int(float64(width) * 0.10)
+		maxloader  = int(float64(width) * 0.35)
+		percentage = 6
 	)
 
-	if len(prefix) > width {
-		return ioprogress.DrawTerminalf(p.Output, func(progress, total int64) string {
-			prcntg := float32(progress) / float32(total) * 100
+	switch {
+	// Very slim terminal. Trimmed prefix and loading percentage are visible.
+	case width < len(prefix):
+		cutprefix := prefix[:width-percentage-2] + "..."
 
-			return fmt.Sprintf("%s %.0f", prefix[:width-8]+"...", prcntg) + "%"
+		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
+			progress := float32(current) / float32(total) * 100
+
+			return fmt.Sprintf("%s %.0f", cutprefix, progress) + "%"
+		})
+
+	// Slim terminal. Full prefix and loading percentage are visible.
+	case width < len(prefix)+minloader+percentage:
+		padding := strings.Repeat(" ", width-len(prefix)-percentage)
+
+		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
+			progress := float32(current) / float32(total) * 100
+
+			return fmt.Sprintf("%s %s %.0f", prefix, padding, progress) + "%"
+		})
+
+	// Small terminal. Full prefix, minimal loader and percentage are visible.
+	case width < len(prefix)+maxloader+percentage:
+		padding := strings.Repeat(" ", width-len(prefix)-percentage-minloader-1)
+
+		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
+			progress := float32(current) / float32(total) * 100
+			curr := int((float64(current) / float64(total)) * float64(minloader))
+			loader := fmt.Sprintf(
+				"[%s%s]", strings.Repeat("#", curr),
+				strings.Repeat("-", minloader-curr),
+			)
+
+			return fmt.Sprintf("%s%s%s %.0f", prefix, padding, loader, progress) + "%"
+		})
+
+	// Normal size terminal. Full prefix, full loader and percetage are visible.
+	default:
+		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
+
+			return "nani"
 		})
 	}
 
-	if paddingWidth+5 < 0 {
-		return ioprogress.DrawTerminalf(p.Output, func(progress, total int64) string {
-			prcntg := float32(progress) / float32(total) * 100
+	// if paddingWidth+5 < 0 {
+	// 	return ioprogress.DrawTerminalf(p.Output, func(progress, total int64) string {
+	// 		prcntg := float32(progress) / float32(total) * 100
 
-			return fmt.Sprintf("%s %.0f", prefix[:width-8]+"...", prcntg) + "%"
-			// return prefix
-		})
-	}
+	// 		return fmt.Sprintf("%s %.0f", prefix[:width-8]+"...", prcntg) + "%"
+	// 		// return prefix
+	// 	})
+	// }
 
-	padding := strings.Repeat(" ", paddingWidth)
-	return ioprogress.DrawTerminalf(p.Output, func(progress, total int64) string {
-		prcntg := float32(progress) / float32(total) * 100
+	// padding := strings.Repeat(" ", paddingWidth)
 
-		current := int((float64(progress) / float64(total)) * float64(loaderwidth))
-		bar := fmt.Sprintf(
-			"[%s%s]", strings.Repeat("#", int(current)),
-			strings.Repeat("-", int(loaderwidth-current)),
-		)
+	// return ioprogress.DrawTerminalf(p.Output, func(progress, total int64) string {
+	// 	prcntg := float32(progress) / float32(total) * 100
 
-		return fmt.Sprintf("%s%s%s %.0f", prefix, padding, bar, prcntg) + "%"
-	})
+	// 	return
+	// })
 }
