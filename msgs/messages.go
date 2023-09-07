@@ -62,6 +62,7 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 
 	var (
 		prefix     = fmt.Sprintf("(%d/%d) %s", p.Current, p.Total, p.Msg)
+		prefixlen  = len(prefix)
 		maxloader  = int(float64(width) * 0.35)
 		minloader  = 12
 		percentage = 6
@@ -69,7 +70,7 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 
 	switch {
 	// Very slim terminal. Trimmed prefix and loading percentage are visible.
-	case width < len(prefix):
+	case width < prefixlen:
 		cutprefix := prefix[:width-percentage]
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
@@ -79,8 +80,8 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 		})
 
 	// Slim terminal. Full prefix and loading percentage are visible.
-	case width < len(prefix)+minloader+percentage:
-		padding := strings.Repeat(" ", width-len(prefix)-percentage)
+	case width < prefixlen+minloader+percentage:
+		padding := strings.Repeat(" ", width-prefixlen-percentage)
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
 			progress := float32(current) / float32(total) * 100
@@ -89,8 +90,8 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 		})
 
 	// Small terminal. Full prefix, minimal loader and percentage are visible.
-	case width < len(prefix)+maxloader+percentage:
-		padding := strings.Repeat(" ", width-len(prefix)-percentage-minloader-1)
+	case width < prefixlen+maxloader+percentage:
+		padding := strings.Repeat(" ", width-prefixlen-percentage-minloader-1)
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
 			progress := float32(current) / float32(total) * 100
@@ -105,7 +106,7 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 
 	// Normal size terminal. Full prefix, full loader and percetage are visible.
 	default:
-		padding := strings.Repeat(" ", width-len(prefix)-percentage-maxloader-1)
+		padding := strings.Repeat(" ", width-prefixlen-percentage-maxloader-1)
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
 			progress := float32(current) / float32(total) * 100
