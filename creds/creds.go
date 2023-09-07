@@ -30,17 +30,16 @@ func Get(protocol, addr string) (string, string, error) {
 
 	lines := strings.Split(string(b), "\n")
 	for _, line := range lines {
-		if strings.HasPrefix(line, protocol+":") &&
-			strings.HasSuffix(line, addr) {
+		if strings.HasPrefix(line, protocol+":") && strings.HasSuffix(line, addr) {
 
 			splt := strings.Split(line, ":")
 
-			if len(splt) != 3 {
+			if len(splt) < 2 {
 				return ``, ``, errors.New("bad git credentials")
 			}
 
 			login := strings.ReplaceAll(splt[1], "//", "")
-			password := strings.ReplaceAll(splt[2], "@"+addr, "")
+			password := strings.Split(splt[2], "@")[0]
 			return login, password, nil
 		}
 	}
