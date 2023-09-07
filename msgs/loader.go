@@ -34,13 +34,13 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 		prefixlen  = len(prefix)
 		maxloader  = int(float64(width) * 0.35)
 		minloader  = 12
-		percentage = 6
+		percentage = 4
 	)
 
 	switch {
 	// Very slim terminal. Trimmed prefix and loading percentage are visible.
-	case width < prefixlen:
-		cutprefix := prefix[:width-percentage]
+	case width <= prefixlen+percentage+1:
+		cutprefix := prefix[:width-percentage-4] + "..."
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
 			progress := float32(current) / float32(total) * 100
@@ -49,17 +49,17 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 		})
 
 	// Slim terminal. Full prefix and loading percentage are visible.
-	case width < prefixlen+minloader+percentage:
+	case width <= prefixlen+minloader+percentage:
 		padding := strings.Repeat(" ", width-prefixlen-percentage)
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
 			progress := float32(current) / float32(total) * 100
 
-			return fmt.Sprintf("%s %s %.0f", prefix, padding, progress) + "%"
+			return fmt.Sprintf("%s%s%.0f", prefix, padding, progress) + "%"
 		})
 
 	// Small terminal. Full prefix, minimal loader and percentage are visible.
-	case width < prefixlen+maxloader+percentage:
+	case width < prefixlen+maxloader+percentage+1:
 		padding := strings.Repeat(" ", width-prefixlen-percentage-minloader-1)
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
