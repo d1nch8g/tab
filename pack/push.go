@@ -202,7 +202,7 @@ func push(pp PushParameters, m PackageMetadata, i, t int) error {
 				Current: i,
 				Total:   t,
 				Msg: fmt.Sprintf(
-					"Push %s/%s", path.Join(m.Addr, m.Owner),
+					"%s/%s", path.Join(m.Addr, m.Owner),
 					strings.TrimSuffix(m.FileName, ".pkg.tar.zst"),
 				),
 				Output: os.Stdout,
