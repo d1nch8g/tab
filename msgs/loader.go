@@ -32,15 +32,14 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 	var (
 		prefix     = fmt.Sprintf("(%d/%d) %s", p.Current, p.Total, p.Msg)
 		prefixlen  = len(prefix)
-		maxloader  = int(float64(width) * 0.35)
-		minloader  = 12
-		percentage = 6
+		loader     = int(float64(width) * 0.35)
+		percentage = 4
 	)
 
 	switch {
 	// Very slim terminal. Trimmed prefix and loading percentage are visible.
-	case width < prefixlen:
-		cutprefix := prefix[:width-percentage]
+	case width < prefixlen+percentage+1:
+		cutprefix := prefix[:width-percentage-4] + "..."
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
 			progress := float32(current) / float32(total) * 100
@@ -49,40 +48,25 @@ func Loader(p *LoaderParameters) func(int64, int64) error {
 		})
 
 	// Slim terminal. Full prefix and loading percentage are visible.
-	case width < prefixlen+minloader+percentage:
+	case width < prefixlen+loader+percentage+3:
 		padding := strings.Repeat(" ", width-prefixlen-percentage)
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
 			progress := float32(current) / float32(total) * 100
 
-			return fmt.Sprintf("%s %s %.0f", prefix, padding, progress) + "%"
-		})
-
-	// Small terminal. Full prefix, minimal loader and percentage are visible.
-	case width < prefixlen+maxloader+percentage:
-		padding := strings.Repeat(" ", width-prefixlen-percentage-minloader-1)
-
-		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
-			progress := float32(current) / float32(total) * 100
-			curr := int((float64(current) / float64(total)) * float64(minloader))
-			loader := fmt.Sprintf(
-				"[%s%s]", strings.Repeat("#", curr),
-				strings.Repeat("-", minloader-curr),
-			)
-
-			return fmt.Sprintf("%s%s%s %.0f", prefix, padding, loader, progress) + "%"
+			return fmt.Sprintf("%s%s%.0f", prefix, padding, progress) + "%"
 		})
 
 	// Normal size terminal. Full prefix, full loader and percetage are visible.
 	default:
-		padding := strings.Repeat(" ", width-prefixlen-percentage-maxloader-1)
+		padding := strings.Repeat(" ", width-prefixlen-percentage-loader-3)
 
 		return ioprogress.DrawTerminalf(p.Output, func(current, total int64) string {
 			progress := float32(current) / float32(total) * 100
-			curr := int((float64(current) / float64(total)) * float64(maxloader))
+			curr := int((float64(current) / float64(total)) * float64(loader))
 			loader := fmt.Sprintf(
 				"[%s%s]", strings.Repeat("#", curr),
-				strings.Repeat("-", maxloader-curr),
+				strings.Repeat("-", loader-curr),
 			)
 
 			return fmt.Sprintf("%s%s%s %.0f", prefix, padding, loader, progress) + "%"
