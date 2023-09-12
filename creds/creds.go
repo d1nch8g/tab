@@ -16,6 +16,10 @@ import (
 	"fmnx.su/core/pack/msgs"
 )
 
+var (
+	ErrNoCreds = errors.New("no credentials for required adress")
+)
+
 // Get login and password from git credentials file in user directory.
 func Get(protocol, addr string) (string, string, error) {
 	userdir, err := os.UserHomeDir()
@@ -31,20 +35,16 @@ func Get(protocol, addr string) (string, string, error) {
 	lines := strings.Split(string(b), "\n")
 	for _, line := range lines {
 		if strings.HasPrefix(line, protocol+":") && strings.HasSuffix(line, addr) {
-
 			splt := strings.Split(line, ":")
-
-			if len(splt) < 2 {
-				return ``, ``, errors.New("bad git credentials")
-			}
 
 			login := strings.ReplaceAll(splt[1], "//", "")
 			password := strings.Split(splt[2], "@")[0]
+
 			return login, password, nil
 		}
 	}
 
-	return ``, ``, errors.New("no credentials for " + addr)
+	return ``, ``, ErrNoCreds
 }
 
 // Save/Update login and password in git credentials file.
