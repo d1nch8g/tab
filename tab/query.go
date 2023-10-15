@@ -1,15 +1,15 @@
 // 2023 FMNX team.
 // Use of this code is governed by GNU General Public License.
-// Official web page: https://fmnx.su/core/pack
-// Contact email: help@fmnx.su
+// Official web page: https://ion.lc/core/tab
+// Contact email: help@ion.lc
 
-package pack
+package tab
 
 import (
 	"os"
 
-	"fmnx.su/core/pack/msgs"
-	"fmnx.su/core/pack/pacman"
+	"ion.lc/core/tab/msgs"
+	"ion.lc/core/tab/pacman"
 )
 
 // Parameters that will be used to execute push command.

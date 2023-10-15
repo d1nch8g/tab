@@ -1,4 +1,4 @@
-module fmnx.su/core/pack
+module ion.lc/core/tab
 
 go 1.20
 

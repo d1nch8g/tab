@@ -1,11 +1,11 @@
-# Maintainer: Danila Fominykh <dancheg97@fmnx.su>
+# Maintainer: Danila Fominykh <d1nch8g@ion.lc>
 
-pkgname="pack"
-pkgver="0.1.9"
+pkgname="tab"
+pkgver="0.2.0"
 pkgrel="1"
 pkgdesc="Decentralized package manager based on pacman."
 arch=("x86_64")
-url="https://fmnx.su/core/pack"
+url="https://ion.lc/core/tab"
 license=("GPL")
 depends=("pacman")
 makedepends=("go")
@@ -20,5 +20,5 @@ build() {
 }
 
 package() {
-  install -Dm755 p $pkgdir/usr/bin/pack
+  install -Dm755 p $pkgdir/usr/bin/tab
 }

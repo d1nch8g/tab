@@ -1,9 +1,9 @@
 // 2023 FMNX team.
 // Use of this code is governed by GNU General Public License.
-// Official web page: https://fmnx.su/core/pack
-// Contact email: help@fmnx.su
+// Official web page: https://ion.lc/core/tab
+// Contact email: help@ion.lc
 
-package pack
+package tab
 
 import (
 	"bytes"
@@ -13,8 +13,8 @@ import (
 	"os/exec"
 	"strings"
 
-	"fmnx.su/core/pack/msgs"
 	"github.com/jessevdk/go-flags"
+	"ion.lc/core/tab/msgs"
 )
 
 func getOptions[Opts any](arr []Opts) *Opts {

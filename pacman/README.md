@@ -9,7 +9,7 @@ Functions:
 - `Sync` - syncronize packages
 
 ```go
-import "fmnx.su/dancheg97/pacman"
+import "ion.lc/dancheg97/pacman"
 
 func main() {
 	err := pacman.Sync("nano")
@@ -20,7 +20,7 @@ func main() {
 - `Search` - search for packages in pacman databases
 
 ```go
-import "fmnx.su/dancheg97/pacman"
+import "ion.lc/dancheg97/pacman"
 
 func main() {
 	r, err := pacman.Search("vim")
@@ -32,7 +32,7 @@ func main() {
 - `Upgrade` - install packages from local files
 
 ```go
-import "fmnx.su/dancheg97/pacman"
+import "ion.lc/dancheg97/pacman"
 
 func main() {
 	err := pacman.Upgrade("nvim-1-1-any.pkg.tar.zst")
@@ -43,7 +43,7 @@ func main() {
 - `Query` - list installed packages
 
 ```go
-import "fmnx.su/dancheg97/pacman"
+import "ion.lc/dancheg97/pacman"
 
 func main() {
 	r, err := pacman.Query()
@@ -55,7 +55,7 @@ func main() {
 - `Makepkg` - build package
 
 ```go
-import "fmnx.su/dancheg97/pacman"
+import "ion.lc/dancheg97/pacman"
 
 func main() {
 	err := pacman.Makepkg()
@@ -66,7 +66,7 @@ func main() {
 - `Remove` - remove installed packages
 
 ```go
-import "fmnx.su/dancheg97/pacman"
+import "ion.lc/dancheg97/pacman"
 
 func main() {
 	err := pacman.Remove("emacs")
@@ -77,7 +77,7 @@ func main() {
 - `RepoAdd` - add package to local database
 
 ```go
-import "fmnx.su/dancheg97/pacman"
+import "ion.lc/dancheg97/pacman"
 
 func main() {
 	err := pacman.RepoAdd("localhost.db.tar.gz", "vscodium-1-1-x86_64.pkg.tar.zst")

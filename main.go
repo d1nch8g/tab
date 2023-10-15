@@ -1,7 +1,7 @@
 // 2023 FMNX team.
 // Use of this code is governed by GNU General Public License.
-// Official web page: https://fmnx.su/core/pack
-// Contact email: help@fmnx.su
+// Official web page: https://ion.lc/core/tab
+// Contact email: help@ion.lc
 
 package main
 
@@ -11,9 +11,9 @@ import (
 	"reflect"
 	"strings"
 
-	"fmnx.su/core/pack/msgs"
-	"fmnx.su/core/pack/pack"
 	"github.com/jessevdk/go-flags"
+	"ion.lc/core/tab/msgs"
+	"ion.lc/core/tab/tab"
 )
 
 var opts struct {
@@ -30,22 +30,22 @@ var opts struct {
 var help = `Simplified version of pacman
 
 operations:
-	pack {-S --sync}   [options] [(registry)/(owner)/package(s)]
-	pack {-P --push}   [options] [(registry)/(owner)/package(s)]
-	pack {-R --remove} [options] [(registry)/(owner)/package(s)]
-	pack {-B --build}  [options] [git/repository(s)]
-	pack {-Q --query}  [options] [package(s)]
+	tab {-S --sync}   [options] [(registry)/(owner)/package(s)]
+	tab {-P --push}   [options] [(registry)/(owner)/package(s)]
+	tab {-R --remove} [options] [(registry)/(owner)/package(s)]
+	tab {-B --build}  [options] [git/repository(s)]
+	tab {-Q --query}  [options] [package(s)]
 
 use 'pack {-h --help}' with an operation for available options`
 
-var version = `             Pack - package manager.
-          Copyright (C) 2023 FMNX team
+var version = `             Tab - package manager.
+          Copyright (C) 2023 ION
      
   This program may be freely redistributed under
    the terms of the GNU General Public License.
-       Web page: https://fmnx.su/core/pack
+       Web page: https://ion.lc/core/tab
  
-                 Version: 0.1.8`
+                 Version: 0.2.0`
 
 func main() {
 	err := run()
@@ -66,39 +66,39 @@ func run() error {
 
 	switch {
 	case opts.Sync && opts.Help:
-		fmt.Println(pack.SyncHelp)
+		fmt.Println(tab.SyncHelp)
 		return nil
 
 	case opts.Sync:
-		return pack.Sync(args())
+		return tab.Sync(args())
 
 	case opts.Push && opts.Help:
-		fmt.Println(pack.PushHelp)
+		fmt.Println(tab.PushHelp)
 		return nil
 
 	case opts.Push:
-		return pack.Push(args())
+		return tab.Push(args())
 
 	case opts.Remove && opts.Help:
-		fmt.Println(pack.RemoveHelp)
+		fmt.Println(tab.RemoveHelp)
 		return nil
 
 	case opts.Remove:
-		return pack.Remove(args())
+		return tab.Remove(args())
 
 	case opts.Query && opts.Help:
-		fmt.Println(pack.QueryHelp)
+		fmt.Println(tab.QueryHelp)
 		return nil
 
 	case opts.Query:
-		return pack.Query(args())
+		return tab.Query(args())
 
 	case opts.Build && opts.Help:
-		fmt.Println(pack.BuildHelp)
+		fmt.Println(tab.BuildHelp)
 		return nil
 
 	case opts.Build:
-		return pack.Build(args())
+		return tab.Build(args())
 
 	case opts.Version:
 		fmt.Println(version)

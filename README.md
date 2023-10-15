@@ -4,12 +4,10 @@
 
 <h2 align="center">Pack - package manager</h2>
 
-![](https://img.shields.io/badge/status-alpha-red.svg)
-[![](https://img.shields.io/badge/license-gpl-orange.svg)](https://fmnx.su/core/pack/src/branch/main/LICENSE)
-[![](https://img.shields.io/badge/fmnx-repo-006db0.svg)](https://fmnx.su/core/pack)
-[![](https://img.shields.io/badge/codeberg-repo-45a3fb.svg)](https://codeberg.org/fmnx/pack)
-[![](https://img.shields.io/badge/github-repo-white.svg)](https://github.com/fmnx-su/pack)
-[![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://fmnx.su/core/-/packages/arch/pack)
+![](https://img.shields.io/badge/alpha-0.2.0-red.svg)
+[![](https://img.shields.io/badge/license-GPL-orange.svg)](https://ion.lc/core/tab/src/branch/main/LICENSE)
+[![](https://img.shields.io/badge/git-repository-006db0.svg)](https://ion.lc/core/tab)
+[![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://ion.lc/core/-/packages/arch/pack)
 
 > **Warning!** The project is in early alpha, API will propably be changed.
 
@@ -22,7 +20,7 @@ Pack works as a wrapper over pacman, providing additional functionality for soft
 Single line installation script for all arch-based distributions:
 
 ```sh
-git clone https://fmnx.su/core/pack && cd pack && makepkg -sfri --needed --noconfirm
+git clone https://ion.lc/core/tab && cd pack && makepkg -sfri --needed --noconfirm
 ```
 
 ---
@@ -69,7 +67,7 @@ pack -R for example.com/owner/package@1-1
 4. Build packages - command that you use to build packages. If you provide git repo(s) in arguments, this command will clone and build them.
 
 ```sh
-pack -B aur.archlinux.org/veloren-bin fmnx.su/core/ainst
+pack -B aur.archlinux.org/veloren-bin ion.lc/core/ainst
 pack -Bqsa onlyoffice-bin
 ```
 
@@ -85,7 +83,7 @@ After a successful build, prepared packages are stored in `/var/cache/pacman/pkg
 5. Push packages - operation that you use to deliver your software to any pack registry (currently only gitea supported).
 
 ```sh
-pack -P fmnx.su/core/onlyoffice-bin
+pack -P ion.lc/core/onlyoffice-bin
 ```
 
 - `-d`, `--dir` - Use custom source dir with packages (default pacman cache)

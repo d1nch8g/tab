@@ -1,9 +1,9 @@
 // 2023 FMNX team.
 // Use of this code is governed by GNU General Public License.
-// Official web page: https://fmnx.su/core/pack
-// Contact email: help@fmnx.su
+// Official web page: https://ion.lc/core/tab
+// Contact email: help@ion.lc
 
-package pack
+package tab
 
 import (
 	"errors"
@@ -11,8 +11,8 @@ import (
 	"os"
 	"strings"
 
-	"fmnx.su/core/pack/pacman"
-	"fmnx.su/core/pack/process"
+	"ion.lc/core/tab/pacman"
+	"ion.lc/core/tab/process"
 )
 
 type SyncParameters struct {
