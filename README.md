@@ -2,16 +2,14 @@
 <img style="align: center; padding-left: 10px; padding-right: 10px; padding-bottom: 10px;" width="238px" height="238px" src="./logo.png" />
 </p>
 
-<h2 align="center">Pack - package manager</h2>
+<h2 align="center">Tab - decentralized package manager</h2>
 
 ![](https://img.shields.io/badge/alpha-0.2.0-red.svg)
 [![](https://img.shields.io/badge/license-GPL-orange.svg)](https://ion.lc/core/tab/src/branch/main/LICENSE)
 [![](https://img.shields.io/badge/git-repository-006db0.svg)](https://ion.lc/core/tab)
-[![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://ion.lc/core/-/packages/arch/pack)
+[![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://ion.lc/core/-/packages/arch/tab)
 
-> **Warning!** The project is in early alpha, API will propably be changed.
-
-Pack works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management. Main goal of pack is to simplify process of arch package creation,
+Tab works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management. Main goal of tab is to simplify process of arch package creation, increase delivery speed and to improve overall user experience.
 
 ---
 
@@ -20,7 +18,7 @@ Pack works as a wrapper over pacman, providing additional functionality for soft
 Single line installation script for all arch-based distributions:
 
 ```sh
-git clone https://ion.lc/core/tab && cd pack && makepkg -sfri --needed --noconfirm
+git clone https://ion.lc/core/tab && cd tab && makepkg -sfri --needed --noconfirm
 ```
 
 ---
@@ -30,7 +28,7 @@ git clone https://ion.lc/core/tab && cd pack && makepkg -sfri --needed --noconfi
 1. Sync packages - operation that you use to install packages to the system.
 
 ```sh
-pack -Sy nano blender for example.com/owner/package
+tab -Sy nano blender for example.com/owner/package
 ```
 
 You can mix packages with and without registries in input. This command will add missing registries to `pacman.conf` and try to synchronize packages with pacman. Flags for operation:
@@ -44,7 +42,7 @@ You can mix packages with and without registries in input. This command will add
 2. Query packages - operation that you use to inspect the state of your system or view package parameters.
 
 ```sh
-pack -Qi pacman
+tab -Qi pacman
 ```
 
 - `-i`, `--info` - View package information (-ii for backup files)
@@ -54,8 +52,8 @@ pack -Qi pacman
 3. Remove packages - this operation will remove packages from the system or registry. By default, it removes local packages, if you provide a registry, remote deletion will be executed. When removing remote packages, they provide a version after @.
 
 ```sh
-pack -R vim
-pack -R for example.com/owner/package@1-1
+tab -R vim
+tab -R for example.com/owner/package@1-1
 ```
 
 - `-c`, `--confirm` - Ask for confirmation when deleting package
@@ -67,8 +65,8 @@ pack -R for example.com/owner/package@1-1
 4. Build packages - command that you use to build packages. If you provide git repo(s) in arguments, this command will clone and build them.
 
 ```sh
-pack -B aur.archlinux.org/veloren-bin ion.lc/core/ainst
-pack -Bqsa onlyoffice-bin
+tab -B aur.archlinux.org/veloren-bin ion.lc/core/ainst
+tab -Bqsa onlyoffice-bin
 ```
 
 After a successful build, prepared packages are stored in `/var/cache/pacman/pkg`. Delete flags:
@@ -83,7 +81,7 @@ After a successful build, prepared packages are stored in `/var/cache/pacman/pkg
 5. Push packages - operation that you use to deliver your software to any pack registry (currently only gitea supported).
 
 ```sh
-pack -P ion.lc/core/onlyoffice-bin
+tab -P ion.lc/core/onlyoffice-bin
 ```
 
 - `-d`, `--dir` - Use custom source dir with packages (default pacman cache)
