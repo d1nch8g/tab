@@ -40,7 +40,7 @@ func Get(protocol, addr string) (string, string, error) {
 			login := strings.ReplaceAll(splt[1], "//", "")
 			password := strings.Split(splt[2], "@")[0]
 
-			return login, password, nil
+			return login, strings.ReplaceAll(password, "%40", "@"), nil
 		}
 	}
 
@@ -53,6 +53,7 @@ func Put(protocol, addr, login, pass string) error {
 	if err != nil {
 		return err
 	}
+	pass = strings.ReplaceAll(pass, "@", "%40")
 
 	credsfile := path.Join(userdir, ".git-credentials")
 	credsline := fmt.Sprintf("%s://%s:%s@%s\n", protocol, login, pass, addr)
