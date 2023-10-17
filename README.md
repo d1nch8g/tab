@@ -4,9 +4,8 @@
 
 <h2 align="center">Tab - decentralized package manager</h2>
 
-![](https://img.shields.io/badge/alpha-0.2.0-red.svg)
-[![](https://img.shields.io/badge/license-GPL-orange.svg)](https://ion.lc/core/tab/src/branch/main/LICENSE)
-[![](https://img.shields.io/badge/git-repository-006db0.svg)](https://ion.lc/core/tab)
+![](https://img.shields.io/badge/alpha-0.2.0-blue.svg)
+[![](https://img.shields.io/badge/license-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://ion.lc/core/-/packages/arch/tab)
 
 Tab works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management. Main goal of tab is to simplify process of arch package creation, increase delivery speed and to improve overall user experience.
