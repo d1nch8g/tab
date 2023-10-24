@@ -38,14 +38,14 @@ operations:
 
 use 'pack {-h --help}' with an operation for available options`
 
-var version = `             Tab - package manager.
-          Copyright (C) 2023 ION
+var version = `             Tab - package manager
+            Copyright (C) 2023 ION
      
   This program may be freely redistributed under
    the terms of the GNU General Public License.
        Web page: https://ion.lc/core/tab
  
-                 Version: 0.2.0`
+                Version: 0.2.0`
 
 func main() {
 	err := run()

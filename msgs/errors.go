@@ -12,19 +12,16 @@ var Err = color.New(color.Bold, color.FgHiRed).Sprintf("error: ")
 var ErrGnuPGprivkeyNotFound = `GnuPG private key not found.
 It is required for package signing, run:
 
-1) Install gnupg:
-` + color.YellowString("pack -S gnupg") + `
-
-2) Generate a key:
+1) Generate a key:
 ` + color.YellowString("gpg --gen-key") + `
 
-3) Get KEY-ID, paste it to next command:
+2) Get KEY-ID, paste it to next command:
 ` + color.YellowString("gpg -k") + `
 
-4) Send it to key GPG server:
+3) Send it to key GPG server:
 ` + color.YellowString("gpg --send-keys KEY-ID") + `
 
-5) Edit ` + color.BlueString("PACKAGER") + ` variable in ` + color.CyanString("/etc/makepkg.conf") + `
+4) Edit ` + color.BlueString("PACKAGER") + ` variable in ` + color.CyanString("/etc/makepkg.conf") + `
 Name and email should match with name and email in GnuPG authority for pack to work properly.
 `
 

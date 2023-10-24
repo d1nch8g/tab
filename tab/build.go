@@ -34,7 +34,7 @@ type BuildParameters struct {
 	Dirty bool `short:"g" long:"dirty"`
 }
 
-var BuildHelp = `Build package
+var BuildHelp = `Build, sign and cache package with signature
 
 options:
 	-q, --quick     Do not ask for any confirmation (noconfirm)
@@ -214,13 +214,13 @@ func EjectLastPathArg(s string) string {
 // name of that directory.
 func CloneOrPullDir(outw, errw io.Writer, repo string) (string, error) {
 	td := os.TempDir()
-	err := os.MkdirAll(path.Join(td, "pack"), os.ModePerm)
+	err := os.MkdirAll(path.Join(td, "tab"), os.ModePerm)
 	if err != nil {
 		return ``, err
 	}
 	project := EjectLastPathArg(repo)
 	msgs.Amsg(outw, "Cloning repository: "+project)
-	gitdir := path.Join(td, "pack", project)
+	gitdir := path.Join(td, "tab", project)
 
 	var errbuf bytes.Buffer
 	cmd := exec.Command("git", "clone", "https://"+repo, gitdir)

@@ -27,7 +27,7 @@ git clone https://ion.lc/core/tab && cd tab && makepkg -sfri --needed --noconfir
 1. Sync packages - operation that you use to install packages to the system.
 
 ```sh
-tab -Sy nano blender for example.com/owner/package
+tab -Sy nano blender example.com/owner/package
 ```
 
 You can mix packages with and without registries in input. This command will add missing registries to `pacman.conf` and try to synchronize packages with pacman. Flags for operation:
@@ -52,7 +52,7 @@ tab -Qi pacman
 
 ```sh
 tab -R vim
-tab -R for example.com/owner/package@1-1
+tab -R example.com/owner/package@1-1
 ```
 
 - `-c`, `--confirm` - Ask for confirmation when deleting package
