@@ -8,7 +8,11 @@
 [![](https://img.shields.io/badge/license-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://ion.lc/core/-/packages/arch/tab)
 
-Tab works as a wrapper over pacman, providing additional functionality for software delivery and pacman database management. Main goal of tab is to simplify process of arch package creation, increase delivery speed and to improve overall user experience.
+Tab is decentralized package manager - automates the process of installing, upgrading, configuring, and removing programs, not tying user to specific package registry. Simple web links `example.com/owner/package` can be used to install software. Software updates are manager automatically with regular system updates.
+
+Tab works as a wrapper over [pacman](https://wiki.archlinux.org/title/Pacman), keeping full compatability with [arch package format](https://wiki.archlinux.org/title/Arch_package_guidelines) (typically, `.pkg.tar.zst` packages with [GnuPG](https://gnupg.org/) signatures). Also tab provides additional functionality for software delivery and handles pacman database management automatically.
+
+Main goal of the project is to simplify process of arch package creation, increase delivery speed and create simple and accesible but still powerfull package management solution.
 
 ---
 
