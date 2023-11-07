@@ -8,7 +8,7 @@
 [![](https://img.shields.io/badge/license-GPL-orange.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![](https://img.shields.io/badge/arch-package-00bcd4.svg)](https://ion.lc/core/-/packages/arch/tab)
 
-Tab is decentralized package manager - automates the process of installing, upgrading, configuring, and removing programs, not tying user to specific package registry. Simple web links `example.com/owner/package` can be used to install software. Software updates are manager automatically with regular system updates.
+Tab is decentralized package manager - automates the process of installing, upgrading, configuring, and removing programs, not tying user to specific package registry. Simple web links `example.com/owner/package` can be used to install software.
 
 Tab works as a wrapper over [pacman](https://wiki.archlinux.org/title/Pacman), keeping full compatability with [arch package format](https://wiki.archlinux.org/title/Arch_package_guidelines) (typically, `.pkg.tar.zst` packages with [GnuPG](https://gnupg.org/) signatures). Also tab provides additional functionality for software delivery and handles pacman database management automatically.
 
