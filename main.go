@@ -1,4 +1,3 @@
-// 2023 FMNX team.
 // Use of this code is governed by GNU General Public License.
 // Official web page: https://ion.lc/core/tab
 // Contact email: help@ion.lc
@@ -39,7 +38,7 @@ operations:
 use 'pack {-h --help}' with an operation for available options`
 
 var version = `             Tab - package manager
-            Copyright (C) 2023 ION
+            Copyright  (C) 2023 ION
      
   This program may be freely redistributed under
    the terms of the GNU General Public License.
@@ -62,7 +61,6 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	RemoveCapitalArgs()
 
 	switch {
 	case opts.Sync && opts.Help:
@@ -152,19 +150,4 @@ func args() []string {
 	}
 
 	return filtered
-}
-
-// TODO: remove later when bug with unknown args fixed.
-func RemoveCapitalArgs() {
-	var newargs []string
-	for _, v := range os.Args {
-		if strings.HasPrefix(v, "-") {
-			rootargs := []string{"Q", "R", "S", "P", "B", "G", "T"}
-			for _, letter := range rootargs {
-				v = strings.Replace(v, letter, "", 1)
-			}
-		}
-		newargs = append(newargs, v)
-	}
-	os.Args = newargs
 }

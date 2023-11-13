@@ -1,4 +1,3 @@
-// 2023 FMNX team.
 // Use of this code is governed by GNU General Public License.
 // Official web page: https://ion.lc/core/tab
 // Contact email: help@ion.lc

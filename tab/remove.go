@@ -1,4 +1,3 @@
-// 2023 FMNX team.
 // Use of this code is governed by GNU General Public License.
 // Official web page: https://ion.lc/core/tab
 // Contact email: help@ion.lc
@@ -120,7 +119,7 @@ func rmRemote(p *RemoveParameters, pkg string) error {
 
 	protocol := "https"
 	if p.Insecure {
-		protocol = "http://"
+		protocol = "http"
 	}
 
 	req, err := http.NewRequest(
