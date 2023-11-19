@@ -1,7 +1,7 @@
 # Maintainer: Danila Fominykh <d1nch8g@ion.lc>
 
 pkgname="tab"
-pkgver="0.2.0"
+pkgver="0.2.2"
 pkgrel="1"
 pkgdesc="Decentralized package manager based on pacman."
 arch=("x86_64")

@@ -28,10 +28,10 @@ options:
 	-l, --list     List the files owned by the queried package
 	-o, --outdated List outdated packages
 
-usage:  pack {-Q --query} [options] <(registry)/(owner)/package(s)>`
+usage: tab {-Q --query} [options] <(registry)/(owner)/package(s)>`
 
 func Query(args []string, prms ...QueryParameters) error {
-	p := getOptions(prms)
+	p := getParameters(prms)
 
 	if p.Outdated {
 		err := pacman.SyncList(nil, pacman.SyncParameters{

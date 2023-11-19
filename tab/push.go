@@ -5,7 +5,7 @@
 package tab
 
 import (
-	"encoding/hex"
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"io"
@@ -40,11 +40,11 @@ options:
 	-s, --distro    Assign custom distribution in registry (default archlinux)
 	-e, --export    Export public GPG key armor
 
-usage:  pack {-P --push} [options] <registry/owner/package(s)>`
+usage: tab {-P --push} [options] <registry/owner/package(s)>`
 
 // Push your package to registry.
 func Push(args []string, prms ...PushParameters) error {
-	p := getOptions(prms)
+	p := getParameters(prms)
 
 	if p.Export {
 		return Export(p)
@@ -173,6 +173,7 @@ func push(pp PushParameters, m PackageMetadata, i, t int) error {
 	if err != nil {
 		return err
 	}
+
 	pkgInfo, err := os.Stat(pkgpath)
 	if err != nil {
 		return err
@@ -192,7 +193,7 @@ func push(pp PushParameters, m PackageMetadata, i, t int) error {
 		http.MethodPut,
 		protocol+"://"+path.Join(
 			m.Addr, "api/packages", m.Owner, "arch/push",
-			m.FileName, pp.Distro, hex.EncodeToString(pkgsign),
+			pp.Distro, base64.RawURLEncoding.EncodeToString(pkgsign),
 		),
 		&ioprogress.Reader{
 			Reader: packagefile,
@@ -227,7 +228,7 @@ func push(pp PushParameters, m PackageMetadata, i, t int) error {
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusCreated {
 		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Join(err, errors.New(resp.Status))

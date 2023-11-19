@@ -36,11 +36,11 @@ options:
 	-f, --force    Reinstall up to date targets
 	-i, --insecure Use HTTP protocol for new pacman databases (HTTPS by default)
 
-usage:  pack {-S --sync} [options] <(registry)/(owner)/package(s)>`
+usage: tab {-S --sync} [options] <(registry)/(owner)/package(s)>`
 
 // Syncronize provided packages with provided parameters.
 func Sync(args []string, prms ...SyncParameters) error {
-	p := getOptions(prms)
+	p := getParameters(prms)
 
 	var err error
 	var conf *string

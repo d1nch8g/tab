@@ -16,7 +16,7 @@ import (
 	"ion.lc/core/tab/msgs"
 )
 
-func getOptions[Opts any](arr []Opts) *Opts {
+func getParameters[Opts any](arr []Opts) *Opts {
 	if len(arr) == 1 {
 		return &arr[0]
 	}

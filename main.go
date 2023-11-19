@@ -26,7 +26,7 @@ var opts struct {
 	Build  bool `short:"B" long:"build"`
 }
 
-var help = `Simplified version of pacman
+var help = `Decentralized package manager
 
 operations:
 	tab {-S --sync}   [options] [(registry)/(owner)/package(s)]
@@ -35,7 +35,7 @@ operations:
 	tab {-B --build}  [options] [git/repository(s)]
 	tab {-Q --query}  [options] [package(s)]
 
-use 'pack {-h --help}' with an operation for available options`
+use 'tab {-h --help}' with an operation for available options`
 
 var version = `             Tab - package manager
             Copyright  (C) 2023 ION
@@ -44,7 +44,7 @@ var version = `             Tab - package manager
    the terms of the GNU General Public License.
        Web page: https://ion.lc/core/tab
  
-                Version: 0.2.0`
+                Version: 0.2.1`
 
 func main() {
 	err := run()
@@ -61,6 +61,8 @@ func run() error {
 	if err != nil {
 		return err
 	}
+
+	RemoveCapitalArgs()
 
 	switch {
 	case opts.Sync && opts.Help:
@@ -150,4 +152,18 @@ func args() []string {
 	}
 
 	return filtered
+}
+
+func RemoveCapitalArgs() {
+	var newargs []string
+	for _, v := range os.Args {
+		if strings.HasPrefix(v, "-") {
+			rootargs := []string{"S", "P", "R", "B", "Q"}
+			for _, letter := range rootargs {
+				v = strings.Replace(v, letter, "", 1)
+			}
+		}
+		newargs = append(newargs, v)
+	}
+	os.Args = newargs
 }

@@ -40,10 +40,10 @@ options:
 	-s, --cascade  Remove packages and all packages that depend on them
 	-i, --insecure Use HTTP protocol for API calls (remote delete)
 
-usage:  pack {-R --remove} [options] <(registry)/(owner)/package(s)>`
+usage: tab {-R --remove} [options] <(registry)/(owner)/package(s)(@ver-rel)>`
 
 func Remove(args []string, prms ...RemoveParameters) error {
-	p := getOptions(prms)
+	p := getParameters(prms)
 
 	local, remote := splitRemoved(args)
 
@@ -149,7 +149,7 @@ func rmRemote(p *RemoveParameters, pkg string) error {
 	if err != nil {
 		return err
 	}
-	if resp.StatusCode != http.StatusOK {
+	if resp.StatusCode != http.StatusNoContent {
 		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return errors.Join(err, errors.New(resp.Status))

@@ -43,11 +43,11 @@ options:
 	-g, --dirty     Do not clean workspace before and after build
 	-a, --aur       Build targets from AUR git repositories (aur.archlinux.org)
 
-usage:  pack {-B --build} [options] <git/repository(s)>`
+usage: tab {-B --build} [options] <git/repository(s)>`
 
 // Build package in current directory with provided arguements.
 func Build(args []string, prms ...BuildParameters) error {
-	p := getOptions(prms)
+	p := getParameters(prms)
 
 	msgs.Amsg(os.Stdout, "Building packages")
 
